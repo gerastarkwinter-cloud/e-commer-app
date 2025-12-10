@@ -72,15 +72,38 @@ export const CatalogStore = signalStore(
                         )
                 }),
 
-            ))
-    })
-    ),
-    // withHooks({
-    //     onInit: (store) => {
-    //         console.log('CatalogStore initialized with state:', store);
-    //     },
-    //     onDestroy(store) {
-    //         console.log('CatalogStore destroyed. Final state:', store);
-    //     },
-    // })
-);
+            )),
+        loadProductById: rxMethod<number>(
+            pipe(
+                tap(() => {
+                    console.log('Cargando producto por ID...');
+                    patchState(store, { loading: true, error: null });
+                }),
+                switchMap((id) => {
+                    return repo.getById(id)
+                        .pipe(
+                            tapResponse({
+                                next: (product) => {
+                                    console.log('Producto cargado:', product);
+                                    patchState(store, {
+                                        selectedProduct: product,
+                                        loading: false
+                                    });
+                                },
+                                error: (error) => {
+                                    console.error('Error al cargar el producto:', error);
+                                    patchState(store, { error: 'Error al cargar el producto', loading: false });
+                                }
+                            })
+                        )
+                })
+            )),
+        // withHooks({
+        //     onInit: (store) => {
+        //         console.log('CatalogStore initialized with state:', store);
+        //     },
+        //     onDestroy(store) {
+        //         console.log('CatalogStore destroyed. Final state:', store);
+        //     },
+        // })
+    })));

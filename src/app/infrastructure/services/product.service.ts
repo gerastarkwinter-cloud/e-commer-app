@@ -4,8 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { concatMap, from, Observable, of, switchMap, toArray } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ProductRepository, CatalogDetails } from '../../domain/repositories/product.repository';
-import { Product } from '../../domain'
+import { ProductRepository } from '../../domain/repositories/product.repository';
+import { CatalogDetails, Product } from '../../domain'
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends ProductRepository {
@@ -44,7 +44,7 @@ export class ProductService extends ProductRepository {
         );
     }
 
-    getById(id: number): Observable<Product | null> {
+    getById(id: number): Observable<Product> {
         return this.http.get<Product>(`${this.API_URL}/products/${id}`);
     }
 

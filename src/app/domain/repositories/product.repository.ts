@@ -1,11 +1,5 @@
 import { Observable } from "rxjs";
-import { CategoryGroup, Product } from "..";
-
-export type CatalogDetails = {
-    products: Product[];
-    categories: string[];
-    productGroupByCategory: CategoryGroup[];
-}
+import { CatalogDetails, Product } from "..";
 
 export abstract class ProductRepository {
     abstract getAll(): Observable<CatalogDetails>;
