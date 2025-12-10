@@ -19,14 +19,19 @@ export class App implements OnInit {
     console.log('🫸Total :', this.catalogStore.totalProducts());
 
     // Effects
-    // effect(() => {
-    //   console.log('Efecto - Loading State:', this.catalogStore.loading());
-    //   console.log('🛒 Productos :', this.catalogStore.products());
-
-    // });
+    effect(() => {
+      // console.log('Efecto - Loading State:', this.catalogStore.loading());
+      // console.log('🛒 Productos :', this.catalogStore.products());
+      if (this.catalogStore.prodcutGroupBycategory().length > 0) {
+        // console.log('Estado: ', this.catalogStore)
+        // console.log('🫸 Categorías :', this.catalogStore.prodcutGroupBycategory());
+        // console.log('🫸 Total Categorías :', this.catalogStore.categories().length);
+        console.log('🫸 Categorías Detectadas :', this.catalogStore.categories());
+      }
+    });
   }
   ngOnInit(): void {
-    console.log('Productos cargados en OnInit:', this.$products());
-
+    // console.log('Productos cargados en OnInit:', this.$products());
+    // this.catalogStore.get();
   }
 }

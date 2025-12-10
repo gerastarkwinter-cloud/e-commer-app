@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, of } from 'rxjs';
+import { concatMap, from, Observable, of, switchMap, toArray } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { ProductRepository } from '../../application/repositories/product.repository';
-import { Product } from '../../domain/models/product.model';
+import { ProductRepository, CatalogDetails } from '../../domain/repositories/product.repository';
+import { Product } from '../../domain'
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends ProductRepository {
@@ -12,11 +13,39 @@ export class ProductService extends ProductRepository {
 
     constructor(private http: HttpClient) { super(); }
 
-    getAll(): Observable<Product[]> {
-        return this.http.get<Product[]>(`${this.API_URL}/products`);
+    getAll(): Observable<CatalogDetails> {
+        return this.http.get<Product[]>(`${this.API_URL}/products`).pipe(
+            switchMap((products) =>
+                this.http
+                    .get<string[]>(`${this.API_URL}/products/categories`)
+                    .pipe(
+                        switchMap((categories) =>
+                            from(categories).pipe(
+                                concatMap((category) =>
+                                    this.http
+                                        .get<Product[]>(`${this.API_URL}/products/category/${category}`)
+                                        .pipe(
+                                            map((prods) => ({
+                                                category,
+                                                products: prods,
+                                            }))
+                                        )
+                                ),
+                                toArray(),
+                                map((groups) => ({
+                                    products: products,
+                                    categories: categories,
+                                    productGroupByCategory: groups,
+                                }))
+                            )
+                        )
+                    )
+            )
+        );
     }
 
     getById(id: number): Observable<Product | null> {
         return this.http.get<Product>(`${this.API_URL}/products/${id}`);
     }
+
 }

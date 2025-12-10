@@ -10,7 +10,7 @@
   <div class="mt-4 bg-gray-400 p-4 rounded container mx-auto h-64 flex items-center justify-start gap-4">
     <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
       [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="catalogStore.getAllsProducts()">Obtener Productos</button>
+      [disabled]="catalogStore.loading()" (click)="catalogStore.loadCatalogFull()">Obtener Productos</button>
   </div>
   <div class="contain-layout">
     <ul class="grid grid-cols-4 gap-4 p-4">

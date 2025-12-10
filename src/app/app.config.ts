@@ -2,7 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { ProductRepository } from './application/repositories/product.repository';
+import { ProductRepository } from './domain/repositories/product.repository';
 import { ProductService } from './infrastructure/services/product.service';
 import { provideHttpClient } from '@angular/common/http';
 
