@@ -1,3 +1,5 @@
+import { CategoryGroup } from "./category.model";
+
 export interface Product {
     id: number;
     title: string;
@@ -5,4 +7,10 @@ export interface Product {
     description: string;
     image: string;
     category: string;
+}
+
+export type CatalogDetails = {
+    products: Product[];
+    categories: string[];
+    productGroupByCategory: CategoryGroup[];
 }
