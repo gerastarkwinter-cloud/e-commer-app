@@ -11,6 +11,24 @@
     <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
       [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
       [disabled]="catalogStore.loading()" (click)="catalogStore.loadCatalogFull()">Obtener Productos</button>
+    <!-- Cart List -->
+    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
+      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
+      [disabled]="catalogStore.loading()" (click)="loadCartByUser()">Carrito</button>
+    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
+      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
+      [disabled]="catalogStore.loading()" (click)="addItemToCart()">Agregar al carrito</button>
+    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
+      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
+      [disabled]="catalogStore.loading()" (click)="updateCartItem()">Actualizar Cantidad</button>
+    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
+      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
+      [disabled]="catalogStore.loading()" (click)="deleteCartItem()">Eliminar Producto</button>
+    <form [formGroup]="formTest">
+      <input type="number" formControlName="userId" placeholder="User ID"
+        class="w-full max-w-xs rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+    </form>
+
   </div>
   <div class="contain-layout">
     <ul class="grid grid-cols-4 gap-4 p-4">
