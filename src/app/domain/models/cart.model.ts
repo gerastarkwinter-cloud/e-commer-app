@@ -1,8 +1,25 @@
 import { Product } from "./product.model";
 
+export interface ProductsCart {
+    productId: number;
+    quantity: number;
+}
+export interface CartItem {
+    productId: number;
+    quantity: number;
+    product?: Product;
+}
+
 export interface Cart {
+    id: number | null;
+    userId: number;
+    items: CartItem[];
+}
+
+export type ResponseListCart = {
     id: number;
     userId: number;
     date: string;
-    products: Product[];
-}
+    products: ProductsCart[];
+};
+
