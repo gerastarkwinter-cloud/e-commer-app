@@ -8,10 +8,11 @@ import { CartStore } from './application';
 import { Cart, CartItem } from './domain';
 import { ShortDescriptionPipe } from './shared/pipes/short-description.pipe';
 import { HoverDirectiveForElement } from './shared/directives/hover.directive';
+import { NotificationComponent } from "./shared/components/notification/notification.component";
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe, HoverDirectiveForElement],
+  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe, HoverDirectiveForElement, NotificationComponent],
   providers: [CatalogStore, CartStore],
   templateUrl: './app.html',
   styleUrl: './app.scss',

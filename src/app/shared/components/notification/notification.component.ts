@@ -1,0 +1,23 @@
+import { CommonModule } from "@angular/common";
+import { Component, inject } from "@angular/core";
+import { NOTIFICATION_UI } from "../../../infrastructure/contract/notification.tokens";
+
+
+@Component({
+    selector: 'app-notification',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './notification.component.html'
+})
+export class NotificationComponent {
+
+    private readonly notificationService = inject(NOTIFICATION_UI)
+    readonly notifyService = this.notificationService.notification;
+    
+    readonly position: string[] = ['left', 'rigth', 'top', 'button'];
+
+    constructor() {
+
+    }
+
+}
