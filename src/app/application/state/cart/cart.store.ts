@@ -54,7 +54,7 @@ export const CartStore = signalStore(
                         });
                     },
                     error: (error) => {
-                        console.error('Error al cargar el carrito:', error);
+                        console.error('Error al cargar el carrito: ', error);
                         patchState(store, { error: 'Error al cargar el carrito', loading: false });
                     }
                 })
@@ -77,12 +77,12 @@ export const CartStore = signalStore(
                                     const idx = merged.findIndex(i => i.productId === newItem.productId);
                                     if (idx === -1) {
                                         merged.push(newItem);
-                                    } else {
+                                    }  else {
                                         merged[idx] = {
                                             ...merged[idx],
                                             quantity: merged[idx].quantity + newItem.quantity,
                                         };
-                                    }
+                                    } 
                                 }
 
                                 patchState(store, {
@@ -93,7 +93,7 @@ export const CartStore = signalStore(
                                 });
                             },
                             error: (error) => {
-                                console.error('Error al agregar el carrito:', error);
+                                console.error('Error al agregar el carrito: ', error);
                                 patchState(store, {
                                     error: 'Error al agregar el carrito',
                                     loading: false,

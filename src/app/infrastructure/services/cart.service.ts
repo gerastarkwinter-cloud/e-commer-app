@@ -29,7 +29,7 @@ export class CartService extends CartRepository {
                             productId: p.productId,
                             quantity: p.quantity,
                         })),
-                    } satisfies Cart;
+                    } as Cart;
                 })
             );
     }
