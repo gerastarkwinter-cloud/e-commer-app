@@ -14,9 +14,3 @@ export type CatalogDetails = {
     categories: string[];
     productGroupByCategory: CategoryGroup[];
 }
-
-// TODO: Agregar el modelo para detallate de productos
-//   "rating": {
-//     "rate": 3.9,
-//     "count": 120
-//   }

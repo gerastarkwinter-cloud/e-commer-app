@@ -98,12 +98,4 @@ export const CatalogStore = signalStore(
                         )
                 })
             )),
-        // withHooks({
-        //     onInit: (store) => {
-        //         console.log('CatalogStore initialized with state:', store);
-        //     },
-        //     onDestroy(store) {
-        //         console.log('CatalogStore destroyed. Final state:', store);
-        //     },
-        // })
     })));
