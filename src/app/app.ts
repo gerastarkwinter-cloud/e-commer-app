@@ -7,10 +7,11 @@ import { CatalogStore } from './application/state/catalog/catalog.store';
 import { CartStore } from './application';
 import { Cart, CartItem } from './domain';
 import { ShortDescriptionPipe } from './shared/pipes/short-description.pipe';
+import { HoverDirectiveForElement } from './shared/directives/hover.directive';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe],
+  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe, HoverDirectiveForElement],
   providers: [CatalogStore, CartStore],
   templateUrl: './app.html',
   styleUrl: './app.scss',

@@ -33,7 +33,7 @@
   <div class="contain-layout">
     <ul class="grid grid-cols-4 gap-4 p-4">
       @for (product of $products(); track product) {
-      <li class="bg-white p-4 rounded shadow">
+      <li appHoverElement class="bg-white p-4 rounded shadow">
         <img [src]="product.image" alt="{{ product.title }}" class="w-full h-48 object-cover mb-4 rounded" />
         <span class="block text-sm text-gray-500 mt-2">Category: {{ product.category }}</span>
         <h2 class="text-lg font-bold mb-2">{{ product.title }}</h2>
@@ -41,7 +41,6 @@
         <span class="text-blue-500 font-semibold">${{ product.price }}</span>
       </li>
       }
-
     </ul>
   </div>
 </div>
