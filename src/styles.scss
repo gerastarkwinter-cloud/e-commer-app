@@ -2,3 +2,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.app-hover-hl {
+    @apply bg-slate-100 border border-blue-400 rounded-lg shadow-sm cursor-pointer transition;
+}
