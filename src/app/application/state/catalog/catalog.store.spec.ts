@@ -4,44 +4,9 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 import { CatalogStore } from './catalog.store';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
-import { Product, CatalogDetails } from '../../../domain';
+import { Product } from '../../../domain';
 import { of, throwError } from 'rxjs';
-
-// Mock del repositorio
-class ProductRepositoryMock extends ProductRepository {
-    getAll = jasmine.createSpy().and.returnValue(
-        of<CatalogDetails>({
-            products: [
-                {
-                    id: 1,
-                    title: 'P1',
-                    price: 10,
-                    description: 'd1',
-                    category: 'electronics',
-                    image: 'img1',
-                } as Product,
-            ],
-            categories: ['electronics'],
-            productGroupByCategory: [
-                {
-                    category: 'electronics',
-                    products: [
-                        {
-                            id: 1,
-                            title: 'P1',
-                            price: 10,
-                            description: 'd1',
-                            category: 'electronics',
-                            image: 'img1',
-                        } as Product,
-                    ],
-                },
-            ],
-        })
-    );
-
-    getById = jasmine.createSpy().and.returnValue(of(null));
-}
+import { ProductRepositoryMock } from './ProductRepositoryMock';
 
 describe('CatalogStore', () => {
     let store: InstanceType<typeof CatalogStore>;
