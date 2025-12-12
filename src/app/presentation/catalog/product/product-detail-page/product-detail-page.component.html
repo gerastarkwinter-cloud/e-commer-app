@@ -1,0 +1,122 @@
+<div class="min-h-screen bg-slate-950 text-slate-50">
+  <div class="mx-auto max-w-6xl px-4 py-6">
+
+    <!-- Migas / volver -->
+    <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+      <a routerLink="/catalog" class="hover:text-slate-100">Catálogo</a>
+      <span>/</span>
+      <span>Detalle de producto</span>
+    </div>
+
+    @if (product(); as product) {
+
+    <div class="grid gap-8 items-start lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+
+      <!-- IZQUIERDA: imagen + descripción larga -->
+      <section class="space-y-4 min-w-0">
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 flex items-center justify-center">
+          <img class="max-h-96 w-full object-contain rounded-xl" [src]="product.image" [alt]="product.title" />
+        </div>
+
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-300 leading-relaxed">
+          <h2 class="mb-2 text-base font-semibold text-slate-100">
+            Descripción
+          </h2>
+          <p>
+            {{ product.description }}
+          </p>
+        </div>
+
+      </section>
+
+      <!-- DERECHA: resumen + compra rápida -->
+      <aside class="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-5 min-w-0">
+
+        <p class="text-xs uppercase tracking-wide text-slate-400">
+          {{ product.category }}
+        </p>
+
+        <h1 class="text-xl font-semibold">
+          {{ product.title }}
+        </h1>
+
+        <div class="flex items-baseline gap-3">
+          <span class="text-2xl font-semibold text-emerald-400">
+            {{ product.price | currency }}
+          </span>
+          <span class="text-xs text-slate-400">
+            Impuestos incluidos
+          </span>
+        </div>
+
+        <!-- rating “fake” por ahora -->
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span class="material-symbols-outlined text-amber-400 text-base">
+            star
+          </span>
+          <span>4.5</span>
+          <span class="text-slate-600">•</span>
+          <span>128 opiniones</span>
+        </div>
+
+        <!-- formulario cantidad + añadir -->
+        <form [formGroup]="form" class="mt-4 space-y-4">
+
+          <div class="flex items-center gap-3">
+            <label class="text-xs text-slate-300">
+              Cantidad
+            </label>
+
+            <div class="inline-flex items-center gap-2 rounded-full bg-slate-800 px-2 py-1 border border-slate-700">
+              <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full
+                         bg-slate-900 text-slate-100 text-sm
+                         hover:bg-slate-700 active:scale-95 transition" (click)="decreaseCount()">
+                −
+              </button>
+
+              <input type="number" min="1" formControlName="amount"
+                class="w-12 text-center bg-transparent text-sm focus:outline-none" />
+
+              <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full
+                         bg-slate-900 text-slate-100 text-sm
+                         hover:bg-slate-700 active:scale-95 transition" (click)="increaseCount()">
+                +
+              </button>
+            </div>
+          </div>
+
+          <button type="button" (click)="onAdd()" class="flex w-full items-center justify-center rounded-full
+                     bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950
+                     hover:bg-emerald-400 active:scale-[0.98] transition">
+            Añadir al carrito
+          </button>
+
+          <button type="button" routerLink="/catalog" class="flex w-full items-center justify-center rounded-full
+                     border border-slate-600 px-4 py-2 text-xs font-medium
+                     text-slate-200 hover:bg-slate-800">
+            Volver al catálogo
+          </button>
+
+        </form>
+
+        <!-- detalles extra “de relleno” -->
+        <div class="border-t border-slate-800 pt-4 text-xs text-slate-400 space-y-1">
+          <p>• Envío estándar en 3–5 días hábiles.</p>
+          <p>• Devoluciones gratuitas dentro de los 30 días.</p>
+          <p>• Pago seguro con tarjetas y billeteras digitales.</p>
+        </div>
+
+      </aside>
+
+    </div>
+
+    } @else {
+    <!-- skeleton simple mientras se carga / si no hay producto -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-sm text-slate-400">
+      Cargando producto…
+    </div>
+    }
+
+  </div>
+</div>

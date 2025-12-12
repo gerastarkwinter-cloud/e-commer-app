@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { CartStore, CatalogStore } from '../../application';
-import { ProductListComponent } from "../../shared/components/product/product-list/product-list.component";
 import { Cart } from '../../domain';
+import { ProductListComponent } from './product/product-list/product-list.component';
 
 @Component({
   selector: 'app-catalog',

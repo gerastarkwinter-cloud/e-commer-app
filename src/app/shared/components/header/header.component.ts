@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit } from '@angular/core';
+import { Component, computed, input, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
@@ -10,6 +10,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+
+  readonly userName = signal('Marcos Maure'); // o lo que tengas
+  readonly userInitial = computed(
+    () => this.userName()[0]?.toUpperCase() ?? '?'
+  );
 
   /** INPUTS */
   readonly title = input.required<string>();

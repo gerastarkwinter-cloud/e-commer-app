@@ -4,10 +4,10 @@ import { patchState, signalStore, withComputed, withMethods, withState } from "@
 import { tapResponse } from "@ngrx/operators";
 
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
-import { of, pipe } from "rxjs";
-import { concatMap, debounceTime, switchMap, tap } from "rxjs/operators";
+import { pipe } from "rxjs";
+import { switchMap, tap } from "rxjs/operators";
 
-import { ANotificationService, Cart, CartItem, Product } from "../../../domain";
+import { ANotificationService, Cart, CartItem } from "../../../domain";
 import { CartRepository } from "../../../domain/repositories/cart.repository";
 
 export interface CartState {
@@ -32,7 +32,7 @@ export const CartStore = signalStore(
         totalItems: () => items().length,
         totalQuantity: () => items().reduce((total, item) => total + item.quantity, 0)
     })),
-    withMethods((store, repo = inject(CartRepository)) => ({
+    withMethods((store, repo = inject(CartRepository), notification = inject(ANotificationService)) => ({
         // Cargar el carrito por usuario
         loadCartByUser: rxMethod<number>(
             pipe(
@@ -78,12 +78,13 @@ export const CartStore = signalStore(
                         tapResponse({
                             next: (cart) => {
                                 patchState(store, {
-                                    id:cart.id,
+                                    id: cart.id,
                                     userId: cart.userId,
                                     items: cart.items,
                                     loading: false,
                                     error: null,
                                 });
+                                notification.success(`La orden con número: ${cart.id} ha sido enviada satisfactoriamente.`)
                             },
                             error: (error) => {
                                 console.error('Error al guardar el carrito: ', error);
