@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output, signal, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Cart, Product } from '../../../../domain';
+import { Cart, CartItem, Product } from '../../../../domain';
+import { ShortDescriptionPipe } from '../../../pipes/short-description.pipe';
 
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe],
   templateUrl: './product-item.component.html',
   styleUrls: ['./product-item.component.scss'],
 })
@@ -14,7 +15,6 @@ export class ProductItemComponent {
 
   /** INPUTS */
   readonly product = input.required<Product>();
-  modePage = input<string>('catalog');
 
   /** OUTPUTS */
   readonly addToCart = output<{ productId: number, quantity: number }>();

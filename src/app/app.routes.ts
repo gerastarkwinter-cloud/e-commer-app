@@ -7,10 +7,10 @@ export const appRoutes: Routes = [
         path: 'catalog', /* component: CatalogPageComponent, */
         loadComponent: () => import('./presentation/catalog/catalog-page.component').then(m => m.CatalogPageComponent)
     },
-    // {
-    //     path: 'cart', /* component: CartPageComponent */
-    //     loadComponent: () => import('./presentation/cart/cart-page.component').then(m => m.CartPageComponent)
-    // },
+    {
+        path: 'cart', /* component: CartPageComponent */
+        loadComponent: () => import('./presentation/cart/cart-page.component').then(m => m.CartPageComponent)
+    },
     // {
     //     path: 'product/:id',
     //     loadComponent: () => import('./presentation/product-detail/product-detail-page.component').then(m => m.ProductDetailPageComponent)
