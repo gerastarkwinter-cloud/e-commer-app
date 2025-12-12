@@ -5,9 +5,9 @@ import { tapResponse } from "@ngrx/operators";
 
 import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { pipe } from "rxjs";
-import { switchMap, tap } from "rxjs/operators";
+import { concatMap, switchMap, tap } from "rxjs/operators";
 
-import { Cart, CartItem } from "../../../domain";
+import { ANotificationService, Cart, CartItem } from "../../../domain";
 import { CartRepository } from "../../../domain/repositories/cart.repository";
 
 export interface CartState {
@@ -30,7 +30,7 @@ export const CartStore = signalStore(
         totalItems: () => items().length,
         totalQuantity: () => items().reduce((total, item) => total + item.quantity, 0)
     })),
-    withMethods((store, repo = inject(CartRepository)) => ({
+    withMethods((store, repo = inject(CartRepository), notification = inject(ANotificationService)) => ({
         // Cargar el carrito por usuario
         loadCartByUser: rxMethod<number>(
             pipe(
@@ -63,13 +63,17 @@ export const CartStore = signalStore(
         // Agregar producto al carrito
         addItemToCart: rxMethod<Cart>(
             pipe(
-                tap(() => {
+                tap((cartInput) => {
+                    console.log('cartInput: ', cartInput)
+
                     patchState(store, { loading: true, error: null });
                 }),
-                switchMap((cartInput) =>
+                concatMap((cartInput) =>
                     repo.createCart(cartInput).pipe(
                         tapResponse({
                             next: (cart) => {
+                                console.log('cart: ', cart)
+
                                 const currentItems = store.items();
                                 const merged: CartItem[] = [...currentItems];
 
@@ -77,20 +81,22 @@ export const CartStore = signalStore(
                                     const idx = merged.findIndex(i => i.productId === newItem.productId);
                                     if (idx === -1) {
                                         merged.push(newItem);
-                                    }  else {
+                                    } else {
                                         merged[idx] = {
                                             ...merged[idx],
                                             quantity: merged[idx].quantity + newItem.quantity,
                                         };
-                                    } 
+                                    }
                                 }
-
                                 patchState(store, {
                                     userId: cart.userId,
                                     items: merged,
                                     loading: false,
                                     error: null,
                                 });
+                                notification.success(`
+                                        El producto ha sido agregado al carrito con exito.
+                                    `)
                             },
                             error: (error) => {
                                 console.error('Error al agregar el carrito: ', error);
@@ -110,7 +116,7 @@ export const CartStore = signalStore(
                 tap(() => {
                     patchState(store, { loading: true, error: null });
                 }),
-                switchMap((cartInput) => {
+                concatMap((cartInput) => {
                     return repo.updateCart(cartInput).pipe(
                         tapResponse({
                             next: (value) => {
@@ -135,6 +141,7 @@ export const CartStore = signalStore(
                                         error: null,
                                     });
                                     console.log('Items fusionados después de la actualización:', merged);
+                                    notification.success(`El producto ha sido actualizado con exito.`)
                                 }
                             },
                             error: (error) => {
@@ -155,17 +162,19 @@ export const CartStore = signalStore(
                 tap(() => {
                     patchState(store, { loading: true, error: null });
                 }),
-                switchMap((productId) => {
+                concatMap((productId) => {
                     return repo.deleteCart(productId).pipe(
                         tapResponse({
                             next: () => {
                                 const currentItems = store.items();
                                 const filteredItems = currentItems.filter(item => item.productId !== productId);
+                                console.log('Listada despues de la eliminacion: ', filteredItems)
                                 patchState(store, {
                                     items: filteredItems,
                                     loading: false,
                                     error: null,
                                 });
+                                notification.success('Producto removido.!')
                             },
                             error: (error) => {
                                 console.error('Error al eliminar el carrito:', error);

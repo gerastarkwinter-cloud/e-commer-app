@@ -1,0 +1,36 @@
+import { CommonModule } from '@angular/common';
+import { Component, input, OnInit, output } from '@angular/core';
+import { ProductItemComponent } from "../product-item/product-item.component";
+import { Cart, Product } from '../../../../domain';
+
+@Component({
+  selector: 'app-product-list',
+  standalone: true,
+  imports: [CommonModule, ProductItemComponent],
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent {
+
+  //** INPUTS */
+  items = input.required<Product[]>();
+
+  /** OUTPUTS */
+  emitToCreate = output<Cart>();
+  emitToUpdate = output<Cart>();
+  emitToDelete = output<number>();
+
+  constructor() { }
+
+  onAddTo(event: any) {
+    this.emitToCreate.emit(event)
+  }
+
+  onUpdateTo(event: any) {
+    this.emitToUpdate.emit(event)
+  }
+
+  onDeleteTo(event: any) {
+    this.emitToDelete.emit(event)
+  }
+}
