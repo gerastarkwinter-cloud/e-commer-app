@@ -10,7 +10,6 @@ import { CartStore } from '../../../../application';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe],
   templateUrl: './product-item.component.html',
-  styleUrls: ['./product-item.component.scss'],
 })
 export class ProductItemComponent {
 

@@ -66,7 +66,7 @@ export const CartStore = signalStore(
         // Confirmar datos del carrito a la nube.
         saveCart: rxMethod<Cart>(
             pipe(
-                tap((cartInput) => {
+                tap(() => {
                     patchState(store, { loading: true, error: null });
                 }),
                 switchMap((cartInput) => {
