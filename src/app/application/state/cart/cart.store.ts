@@ -11,6 +11,7 @@ import { ANotificationService, Cart, CartItem, Product } from "../../../domain";
 import { CartRepository } from "../../../domain/repositories/cart.repository";
 
 export interface CartState {
+    id: number | null;
     userId: number | null;
     items: CartItem[];
     loading: boolean;
@@ -18,6 +19,7 @@ export interface CartState {
 }
 
 const initialState: CartState = {
+    id: null,
     userId: null,
     items: [],
     loading: false,
@@ -47,6 +49,7 @@ export const CartStore = signalStore(
                             return;
                         }
                         patchState(store, {
+                            id: cart.id as number,
                             userId: cart.userId,
                             items: cart.items,
                             loading: false,
@@ -64,19 +67,68 @@ export const CartStore = signalStore(
         saveCart: rxMethod<Cart>(
             pipe(
                 tap((cartInput) => {
-                    console.log('cartInput: ', cartInput)
-
                     patchState(store, { loading: true, error: null });
                 }),
+                switchMap((cartInput) => {
+                    const createOrUpdate$ = cartInput.id == null
+                        ? repo.createCart(cartInput)
+                        : repo.updateCart(cartInput);
+
+                    return createOrUpdate$.pipe(
+                        tapResponse({
+                            next: (cart) => {
+                                patchState(store, {
+                                    id:cart.id,
+                                    userId: cart.userId,
+                                    items: cart.items,
+                                    loading: false,
+                                    error: null,
+                                });
+                            },
+                            error: (error) => {
+                                console.error('Error al guardar el carrito: ', error);
+                                patchState(store, {
+                                    loading: false,
+                                    error: 'Error al guardar el carrito',
+                                });
+                            },
+                        })
+                    );
+                })
+            )
+        ),
+        // Cancelar la orden o eliminar un carrito dada una id.
+        deleteCart: rxMethod<number>(
+            pipe(
+                tap(() => patchState(store, { loading: true, error: null })),
+                switchMap((cartId) => {
+                    return repo.deleteCart(cartId).pipe(
+                        tapResponse({
+                            next: (value) => {
+                                patchState(store, {
+                                    id: null,
+                                    userId: null,
+                                    items: [],
+                                    loading: false,
+                                    error: null,
+                                });
+                            },
+                            error(error) {
+                                console.error('Error al cancelar la orden: ', error);
+                                patchState(store, {
+                                    loading: false,
+                                    error: 'Error al guardar el carrito',
+                                });
+                            },
+                        })
+                    )
+                })
             )
         ),
         // Agregar producto al carrito local.
         addItemToCart: rxMethod<Cart>(
             pipe(
                 tap((itemsInput) => {
-                    let message = '';
-
-                    // console.log('itemsInput: ', itemsInput)
                     patchState(store, { loading: true, error: null });
                     const currentItems = store.items();
                     const merged: CartItem[] = [...currentItems];
@@ -84,84 +136,25 @@ export const CartStore = signalStore(
                         const idx = merged.findIndex(i => i.productId === newItem.productId);
                         if (idx === -1) {
                             merged.push(newItem);
-                        } /* else {
-                            merged[idx] = {
-                                ...merged[idx],
-                                quantity: merged[idx].quantity + newItem.quantity,
-                            };
-                        } */
+                        }
                     }
                     patchState(store, {
                         userId: itemsInput.userId,
                         items: merged,
                         loading: false,
-                        error: message || null,
+                        error: null,
                     });
-                    console.log('Items fusionados después de la actualización:', merged);
                 }),
-                // concatMap((itemsInput) => {
-                //     tapResponse(({
-                //         next:(itemsInput) =>{
-                //             return
-                //         },
-                //         error:(error) =>{
-
-                //         }
-                //     }))
-                // })
-                // concatMap((cartInput) =>
-                //     repo.createCart(cartInput).pipe(
-                //         tapResponse({
-                //             next: (cart) => {
-                //                 console.log('cart: ', cart)
-
-                //                 const currentItems = store.items();
-                //                 const merged: CartItem[] = [...currentItems];
-
-                //                 for (const newItem of cart.items) {
-                //                     const idx = merged.findIndex(i => i.productId === newItem.productId);
-                //                     if (idx === -1) {
-                //                         merged.push(newItem);
-                //                     } else {
-                //                         merged[idx] = {
-                //                             ...merged[idx],
-                //                             quantity: merged[idx].quantity + newItem.quantity,
-                //                         };
-                //                     }
-                //                 }
-                //                 patchState(store, {
-                //                     userId: cart.userId,
-                //                     items: merged,
-                //                     loading: false,
-                //                     error: null,
-                //                 });
-                //                 notification.success(`
-                //                         El producto ha sido agregado al carrito con exito.
-                //                     `)
-                //             },
-                //             error: (error) => {
-                //                 console.error('Error al agregar el carrito: ', error);
-                //                 patchState(store, {
-                //                     error: 'Error al agregar el carrito',
-                //                     loading: false,
-                //                 });
-                //             },
-                //         })
-                //     )
-                // )
             )
         ),
         // Actualizar producto del carrito local.
         updateItemInCart: rxMethod<Cart>(
             pipe(
                 tap((cartInput) => {
-                    let message = '';
                     patchState(store, { loading: true, error: null });
                     if (cartInput) {
                         const currentItems = store.items();
-                        console.log('Items actuales del carrito:', currentItems);
                         const merged: CartItem[] = [...currentItems];
-                        console.log('Items fusionados antes de la actualización:', merged);
                         for (const updateItem of cartInput.items) {
                             const idx = merged.findIndex(i => i.productId === updateItem.productId);
                             if (idx !== -1) {
@@ -169,57 +162,15 @@ export const CartStore = signalStore(
                                     ...merged[idx],
                                     quantity: updateItem.quantity,
                                 };
-                                message = 'Producto actualizado.'
-                            } else {
-                                message = 'Error al actualizar el producto, consulte a soporte.'
                             }
                         }
                         patchState(store, {
                             items: merged,
                             loading: false,
-                            error: message || null,
+                            error: null,
                         });
-                        console.log('Items fusionados después de la actualización:', merged);
                     }
                 }),
-                // concatMap((cartInput) => {
-                //     return repo.updateCart(cartInput).pipe(
-                //         tapResponse({
-                //             next: (value) => {
-                //                 console.log('Carrito actualizado:', value);
-                //                 if (value) {
-                //                     const currentItems = store.items();
-                //                     console.log('Items actuales del carrito:', currentItems);
-                //                     const merged: CartItem[] = [...currentItems];
-                //                     console.log('Items fusionados antes de la actualización:', merged);
-                //                     for (const updateItem of value.items) {
-                //                         const idx = merged.findIndex(i => i.productId === updateItem.productId);
-                //                         if (idx !== -1) {
-                //                             merged[idx] = {
-                //                                 ...merged[idx],
-                //                                 quantity: updateItem.quantity,
-                //                             };
-                //                         }
-                //                     }
-                //                     patchState(store, {
-                //                         items: merged,
-                //                         loading: false,
-                //                         error: null,
-                //                     });
-                //                     console.log('Items fusionados después de la actualización:', merged);
-                //                     notification.success(`El producto ha sido actualizado con exito.`)
-                //                 }
-                //             },
-                //             error: (error) => {
-                //                 console.error('Error al actualizar el carrito:', error);
-                //                 patchState(store, {
-                //                     error: 'Error al actualizar el carrito',
-                //                     loading: false,
-                //                 });
-                //             },
-                //         })
-                //     )
-                // })
             )
         ),
         // Eliminar producto del carrito loca.
@@ -229,38 +180,12 @@ export const CartStore = signalStore(
                     patchState(store, { loading: true, error: null });
                     const currentItems = store.items();
                     const filteredItems = currentItems.filter(item => item.productId !== productId);
-                    console.log('Listada despues de la eliminacion: ', filteredItems)
                     patchState(store, {
                         items: filteredItems,
                         loading: false,
                         error: null,
                     });
-                    // notification.success('Producto removido.!')
                 }),
-                // concatMap((productId) => {
-                //     return repo.deleteCart(productId).pipe(
-                //         tapResponse({
-                //             next: () => {
-                //                 const currentItems = store.items();
-                //                 const filteredItems = currentItems.filter(item => item.productId !== productId);
-                //                 console.log('Listada despues de la eliminacion: ', filteredItems)
-                //                 patchState(store, {
-                //                     items: filteredItems,
-                //                     loading: false,
-                //                     error: null,
-                //                 });
-                //                 notification.success('Producto removido.!')
-                //             },
-                //             error: (error) => {
-                //                 console.error('Error al eliminar el carrito:', error);
-                //                 patchState(store, {
-                //                     error: 'Error al eliminar el carrito',
-                //                     loading: false,
-                //                 });
-                //             },
-                //         })
-                //     );
-                // })
             )
         )
     })

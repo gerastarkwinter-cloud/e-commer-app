@@ -35,13 +35,19 @@ export class CatalogPageComponent implements OnInit {
       quantity
     }]
     const cartItem: Cart = {
-      id: null,
+      id: this.cartStore.id(),
       userId: userId,
       items: productsAdd || []
     }
-    this.cartStore.addItemToCart(cartItem);
-  }
 
+    console.log(cartItem);
+    console.log('Ver valor de cart item cuando toma su primer id: ', cartItem);
+    if (cartItem.id) {
+      this.cartStore.addItemToCart(cartItem);
+    } else {
+      this.cartStore.saveCart(cartItem);
+    }
+  }
 
   UpdateItemToCart(event: any) {
     let productId: number = event.productId;

@@ -14,7 +14,6 @@
   </p>
   <form [formGroup]="formItem" class="mt-auto flex flex-col gap-3">
 
-    <!-- Estado 1: aún no está en carrito -->
     @if (!inCart()) {
     <button type="button" class="inline-flex items-center justify-center rounded-lg
                bg-emerald-600 px-3 py-1.5 text-xs font-medium
@@ -24,7 +23,6 @@
     </button>
     }
 
-    <!-- Estado 2: ya está en carrito -->
     @if (inCart()) {
     <div class="flex flex-1 items-center justify-between gap-3">
       <div class="flex items-center gap-2">

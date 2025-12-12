@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartStore, CatalogStore } from '../../application';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
@@ -13,8 +13,6 @@ import { Cart, CartItem, Product } from '../../domain';
   styleUrls: ['./cart-page.component.scss'],
 })
 export class CartPageComponent {
-
-
 
   private readonly cartStore = inject(CartStore);
   private readonly catalogStore = inject(CatalogStore);
@@ -39,43 +37,52 @@ export class CartPageComponent {
       0)
   });
 
-
-
-
   readonly items = this.cartStore.items;
   readonly totalQuantity = this.cartStore.totalQuantity;
+  readonly cartId = this.cartStore.id;
 
   readonly tax = 10.55;
 
-  constructor() { }
+  constructor() {
+    effect(() => {
+      const items = this.items();
+      const cartId = this.cartId();
+      if (!items.length  && cartId !== null ) {
+        this.cancelOrder();
+      }
+    });
+  }
 
   /**
    * Guarda la informacion del carrito en el backend
    */
   saveCart() {
-   
+    const cartSave: Cart = {
+      id: null,
+      userId: 1,
+      items: this.items()
+    }
+    this.cartStore.saveCart(cartSave);
   }
 
+  cancelOrder() {
+    this.cartStore.deleteCart(this.cartId() as number);
+  }
   /**
    * Actualiza la cantidad de un producto en el carrito.
    * @param event 
    */
   updateItemFromCart(event: any) {
-    console.log('Event: ', event)
     const productsAdd = [{
       productId: event.productId,
       quantity: event.quantity
     }]
     const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
     const cartItem: Cart = {
-      id: 1, // TODO: Cuando se tenga el usuario se trabajara con el id del carrito selecionado, por el momento es fijo.
+      id: this.cartId(), 
       userId: userId,
       items: productsAdd || []
     }
-    // return
-    // const quantity = this.amountCtrl.value;
-    // const productId = this.product().id;
-
     this.cartStore.updateItemInCart(cartItem);
   }
 

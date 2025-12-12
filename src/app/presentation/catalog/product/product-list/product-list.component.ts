@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { ProductItemComponent } from "../product-item/product-item.component";
-import { Cart, CartItem, Product } from '../../../../domain';
+import { Product } from '../../../../domain';
 
 @Component({
   selector: 'app-product-list',
