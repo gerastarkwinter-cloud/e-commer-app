@@ -1,48 +1,10 @@
-<div class="app-container">
-  <h1 class="text-red-500 font-bold">Hola Mundo!</h1>
+<!-- app.html -->
+<div class="min-h-screen bg-slate-950 text-slate-50 flex flex-col">
+  <app-header [title]="title()" [items]="cartItemsCount()" />
 
-  <div class="p-4 bg-gray-200 rounded container mx-auto">
-    <p class="text-lg">Welcome to {{ title() }}!</p>
-    <p class="text-md antialiased ">Loading State: {{ catalogStore.loading() }}</p>
-    <p class="text-md antialiased ">Total productos: {{ catalogStore.totalProducts() }}</p>
-  </div>
-  <div class="divide-x"></div>
-  <div class="mt-4 bg-gray-400 p-4 rounded container mx-auto h-64 flex items-center justify-start gap-4">
-    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="catalogStore.loadCatalogFull()">Obtener Productos</button>
-    <!-- Cart List -->
-    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="loadCartByUser()">Carrito</button>
-    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="addItemToCart()">Agregar al carrito</button>
-    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="updateCartItem()">Actualizar Cantidad</button>
-    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-      [class]="catalogStore.loading() ? 'bg-red-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'"
-      [disabled]="catalogStore.loading()" (click)="deleteCartItem()">Eliminar Producto</button>
-    <form [formGroup]="formTest">
-      <input type="number" formControlName="userId" placeholder="User ID"
-        class="w-full max-w-xs rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
-    </form>
+  <main class="flex-1 p-6">
+    <router-outlet></router-outlet>
+  </main>
 
-  </div>
-  <div class="contain-layout">
-    <ul class="grid grid-cols-4 gap-4 p-4">
-      @for (product of $products(); track product) {
-      <li appHoverElement class="bg-white p-4 rounded shadow">
-        <img [src]="product.image" alt="{{ product.title }}" class="w-full h-48 object-cover mb-4 rounded" />
-        <span class="block text-sm text-gray-500 mt-2">Category: {{ product.category }}</span>
-        <h2 class="text-lg font-bold mb-2">{{ product.title }}</h2>
-        <p class="text-gray-700 mb-4">{{ product.description | shortDescriptionPipe:120}}</p>
-        <span class="text-blue-500 font-semibold">${{ product.price }}</span>
-      </li>
-      }
-    </ul>
-  </div>
+  <app-notification />
 </div>
-
-<app-notification></app-notification>

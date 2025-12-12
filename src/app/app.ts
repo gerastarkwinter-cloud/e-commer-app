@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -9,10 +9,12 @@ import { Cart, CartItem } from './domain';
 import { ShortDescriptionPipe } from './shared/pipes/short-description.pipe';
 import { HoverDirectiveForElement } from './shared/directives/hover.directive';
 import { NotificationComponent } from "./shared/components/notification/notification.component";
+import { RouterOutlet } from "@angular/router";
+import { HeaderComponent } from "./shared/components/header/header.component";
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe, HoverDirectiveForElement, NotificationComponent],
+  imports: [CommonModule, ReactiveFormsModule, /* ShortDescriptionPipe, HoverDirectiveForElement,  */NotificationComponent, RouterOutlet, HeaderComponent],
   providers: [CatalogStore, CartStore],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -20,67 +22,50 @@ import { NotificationComponent } from "./shared/components/notification/notifica
 export class App implements OnInit {
 
 
-  protected readonly title = signal('e-commerce-app');
+  protected readonly title = signal('GenSal23');
   protected readonly catalogStore = inject(CatalogStore);
   protected readonly cartStore = inject(CartStore);
 
-  private readonly fb = inject(FormBuilder);
-  public formTest!: FormGroup;
+  readonly cartItemsCount = computed(() => {
+    return this.cartStore.totalQuantity();
+  });
 
-  public readonly $products = this.catalogStore.products;
+  constructor() { }
 
-  constructor() {
-    this.formTest = this.fb.group({
-      userId: [{ value: 1, disabled: false }],
-    });
-
-    // Effects
-    effect(() => {
-      const carts: CartItem[] = this.cartStore.items();
-
-      if (carts.length > 0) {
-        console.log('🛒 Items en el carrito :', carts);
-      };
-
-      if (this.catalogStore.prodcutGroupBycategory().length > 0) {
-        console.log('🫸 Categorías Detectadas :', this.catalogStore.categories());
-      };
-    });
-  }
   ngOnInit(): void {
 
   }
 
-  addItemToCart() {
-    const newItem: Cart = {
-      id: null,
-      userId: 1,
-      items: [{
-        productId: 7,
-        quantity: 44
-      }]
-    }
+  // addItemToCart() {
+  //   const newItem: Cart = {
+  //     id: null,
+  //     userId: 1,
+  //     items: [{
+  //       productId: 7,
+  //       quantity: 44
+  //     }]
+  //   }
 
-    this.cartStore.addItemToCart(newItem);
-  }
+  //   this.cartStore.addItemToCart(newItem);
+  // }
 
-  updateCartItem() {
-    const updatedItem: Cart = {
-      id: 1,
-      userId: 1,
-      items: [{
-        productId: 1,
-        quantity: 10588445
-      }]
-    }
-    this.cartStore.updateItemInCart(updatedItem);
-  }
+  // updateCartItem() {
+  //   const updatedItem: Cart = {
+  //     id: 1,
+  //     userId: 1,
+  //     items: [{
+  //       productId: 1,
+  //       quantity: 10588445
+  //     }]
+  //   }
+  //   this.cartStore.updateItemInCart(updatedItem);
+  // }
 
-  deleteCartItem(/* productId: number */) {
-    this.cartStore.deleteItemFromCart(1);
-  }
+  // deleteCartItem(/* productId: number */) {
+  //   this.cartStore.deleteItemFromCart(1);
+  // }
 
-  loadCartByUser() {
-    this.cartStore.loadCartByUser(this.formTest.value.userId);
-  }
+  // loadCartByUser() {
+  //   this.cartStore.loadCartByUser(this.formTest.value.userId);
+  // }
 }

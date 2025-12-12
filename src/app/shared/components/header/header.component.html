@@ -1,0 +1,18 @@
+<header class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+  <a routerLink="/catalog" class="text-lg font-semibold">
+    {{ title() }}
+  </a>
+
+  <nav class="flex items-center gap-4">
+    <a routerLink="/catalog" routerLinkActive="font-bold">Catálogo</a>
+
+    <a routerLink="/cart" routerLinkActive="font-bold" class="relative flex items-center gap-1">
+      <span class="material-symbols-outlined">shopping_cart</span>
+      @if (items() > 0) {
+      <span class="relative -top-2 right-3 inline-flex items-center justify-center min-w-[1.4rem] px-1 rounded-full bg-red-600 text-xs min-h-[1.4rem] cursor-pointer">
+        {{ items() }}
+      </span>
+      }
+    </a>
+  </nav>
+</header>
