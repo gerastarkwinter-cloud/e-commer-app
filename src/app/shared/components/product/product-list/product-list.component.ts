@@ -16,8 +16,8 @@ export class ProductListComponent {
   items = input.required<Product[]>();
 
   /** OUTPUTS */
-  emitToCreate = output<Cart>();
-  emitToUpdate = output<Cart>();
+  emitToCreate = output<{ productId: number, quantity: number }>();
+  emitToUpdate = output<{ productId: number, quantity: number }>();
   emitToDelete = output<number>();
 
   constructor() { }

@@ -25,13 +25,39 @@ export class CatalogPageComponent implements OnInit {
     this.catalogStore.loadCatalogFull();
   }
 
-  AddToCart($event: Cart) {
-    $event && this.cartStore.addItemToCart($event);
+  AddToCart(event: any) {
+    let productId: number = event.productId;
+    let quantity: number = event.quantity;
+
+    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const productsAdd = [{
+      productId,
+      quantity
+    }]
+    const cartItem: Cart = {
+      id: null,
+      userId: userId,
+      items: productsAdd || []
+    }
+    this.cartStore.addItemToCart(cartItem);
   }
 
 
-  UpdateItemToCart($event: Cart) {
-    $event && this.cartStore.updateItemInCart($event);
+  UpdateItemToCart(event: any) {
+    let productId: number = event.productId;
+    let quantity: number = event.quantity;
+    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const productsAdd = [{
+      productId,
+      quantity
+    }]
+
+    const cartItem: Cart = {
+      id: 1, // TODO: Cuando se tenga el usuario se trabajara con el id del carrito selecionado, por el momento es fijo.
+      userId: userId,
+      items: productsAdd || []
+    }
+    this.cartStore.updateItemInCart(cartItem);
   }
 
   DeleteItemFromCart($event: number) {

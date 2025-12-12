@@ -17,9 +17,10 @@ export class ProductItemComponent {
 
   // 2) Evento producto cantidad inicial.
   //    (el cart lo construye la page, no la card)
-  readonly addToCart = output<Cart>();
+  readonly addToCart = output<{ productId: number, quantity: number }>();
+
   // 2.1) Evento hacia arriba: producto + cantidad
-  readonly updateToCart = output<Cart>();
+  readonly updateToCart = output<{ productId: number, quantity: number }>();
   // 2.1) Evento hacia arriba: producto + cantidad
   readonly deleteToCart = output<number>();
 
@@ -58,9 +59,8 @@ export class ProductItemComponent {
 
     const quantity = this.amountCtrl.value;
     const productId = this.product().id; // <- USAR el id real
-    const userId = 1; // TODO: Temporal, se usara cuando entre userStore.
 
-    this.addToCart.emit({ items: [{ productId, quantity }], userId, id: null });
+    this.addToCart.emit({ productId, quantity });
     this.inCart.set(true);
   }
 
@@ -72,11 +72,9 @@ export class ProductItemComponent {
 
     const quantity = this.amountCtrl.value;
     const productId = this.product().id;
-    const userId = 1; // TODO: Temporal, se usara cuando entre userStore.
 
     // Aqui es el evento de actualizar.
-    this.updateToCart.emit({ items: [{ productId, quantity }], userId, id: null });
-    // sigue en carrito, solo cambia cantidad
+    this.updateToCart.emit({ productId, quantity });
   }
 
   onCancel(idProduct: number) {
