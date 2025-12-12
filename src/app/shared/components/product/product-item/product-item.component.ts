@@ -12,34 +12,27 @@ import { Cart, Product } from '../../../../domain';
 })
 export class ProductItemComponent {
 
-  // 1) El producto que pinta la card
+  /** INPUTS */
   readonly product = input.required<Product>();
+  modePage = input<string>('catalog');
 
-  // 2) Evento producto cantidad inicial.
-  //    (el cart lo construye la page, no la card)
+  /** OUTPUTS */
   readonly addToCart = output<{ productId: number, quantity: number }>();
-
-  // 2.1) Evento hacia arriba: producto + cantidad
   readonly updateToCart = output<{ productId: number, quantity: number }>();
-  // 2.1) Evento hacia arriba: producto + cantidad
   readonly deleteToCart = output<number>();
 
-  // 3) Estado local de UI: ¿esta card ya está en el carrito?
   readonly inCart = signal(false);
 
-  // 4) Formulario reactivo tipado
   private readonly fb = inject(FormBuilder);
 
   readonly formItem = this.fb.nonNullable.group({
     amount: [1, [Validators.required, Validators.min(1)]],
   });
 
-  // GET cómodo para no repetir controles['amount']
   private get amountCtrl() {
     return this.formItem.controls.amount;
   }
 
-  // ---- Acciones de la UI ----
 
   increaseCount() {
     const current = this.amountCtrl.value;
@@ -73,7 +66,6 @@ export class ProductItemComponent {
     const quantity = this.amountCtrl.value;
     const productId = this.product().id;
 
-    // Aqui es el evento de actualizar.
     this.updateToCart.emit({ productId, quantity });
   }
 

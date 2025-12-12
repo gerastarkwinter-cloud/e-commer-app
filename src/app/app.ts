@@ -26,7 +26,9 @@ export class App implements OnInit {
   protected readonly catalogStore = inject(CatalogStore);
   protected readonly cartStore = inject(CartStore);
 
-  readonly cartItemsCount = computed(() => this.cartStore.items().length);
+  readonly cartItemsCount = computed(() => {
+    return this.cartStore.totalQuantity();
+  });
 
   constructor() { }
 

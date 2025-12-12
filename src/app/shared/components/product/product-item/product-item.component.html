@@ -9,10 +9,13 @@
     {{ product().description }}
   </p>
 
+  <p class="mb-3 text-xs font-medium text-slate-300 line-clamp-2 text-emerald-400">
+    {{ product().price | currency}}
+  </p>
   <form [formGroup]="formItem" class="mt-auto flex flex-col gap-3">
 
     <!-- Estado 1: aún no está en carrito -->
-    @if (!inCart()) {
+    @if (modePage() === 'catalog') {
     <button type="button" class="inline-flex items-center justify-center rounded-lg
                bg-emerald-600 px-3 py-1.5 text-xs font-medium
                hover:bg-emerald-500 active:scale-[0.98]
@@ -22,8 +25,8 @@
     }
 
     <!-- Estado 2: ya está en carrito -->
-    @if (inCart()) {
-    <div class="flex items-center justify-between gap-3">
+    @if (modePage() === 'cart') {
+    <div class="flex flex-1 items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <button type="button" class="flex h-8 w-8 items-center justify-center rounded-lg
                    bg-slate-800 text-slate-100 text-lg
@@ -46,14 +49,15 @@
 
       <div class="flex items-center gap-2">
         <button type="button" class="inline-flex items-center justify-center rounded-lg
-                   bg-emerald-600 px-3 py-1.5 text-xs font-medium
+                   bg-emerald-600 px-3 py-1.5 text-md font-medium gap-2
                    hover:bg-emerald-500 active:scale-[0.98]
                    transition-transform duration-150" (click)="onUpdateAmount()">
-          Actualizar
+          <span class="text-md font-medium material-symbols-outlined ">shopping_cart</span>
+          Añadir
         </button>
 
         <button type="button" class="inline-flex items-center justify-center rounded-lg
-                   bg-slate-700 px-3 py-1.5 text-xs font-medium
+                   bg-slate-700 px-3 py-1.5 text-sm font-medium
                    hover:bg-slate-600 active:scale-[0.98]
                    transition-transform duration-150" (click)="onCancel(product().id)">
           Quitar

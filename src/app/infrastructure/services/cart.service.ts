@@ -15,6 +15,11 @@ export class CartService extends CartRepository {
 
     constructor() { super(); }
 
+    /**
+     * Obtiene un listado de carritos dado el id de usuario.
+     * @param userId 
+     * @returns 
+     */
     getByUser(userId: number): Observable<Cart | null> {
         return this.http
             .get<ResponseListCart[]>(`${this.API_URL}/user/${userId}`)
@@ -34,6 +39,11 @@ export class CartService extends CartRepository {
             );
     }
 
+    /**
+     * Crea un nuevo carrito.
+     * @param cart 
+     * @returns 
+     */
     createCart(cart: Cart): Observable<Cart> {
         const payload = {
             userId: cart.userId,
@@ -59,6 +69,11 @@ export class CartService extends CartRepository {
     }
 
 
+    /**
+     * Actualizar productos de un carrito dada su id.
+     * @param cart 
+     * @returns 
+     */
     updateCart(cart: Cart): Observable<Cart> {
         const payload = {
             userId: cart.userId,
@@ -83,6 +98,11 @@ export class CartService extends CartRepository {
             );
     }
 
+    /**
+     * Eliminar el carrito completo.
+     * @param cartId 
+     * @returns 
+     */
     deleteCart(cartId: number): Observable<void> {
         return this.http
             .delete<void>(`${this.API_URL}/${cartId}`);
