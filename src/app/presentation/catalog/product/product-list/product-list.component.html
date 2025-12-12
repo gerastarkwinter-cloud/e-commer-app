@@ -4,7 +4,8 @@
   <div class="mx-auto max-w-6xl grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     @for (item of items(); track item.id) {
     <app-product-item [product]="item" [isHaveItems]="(!items() || items().length > 0)" (addToCart)="onAddTo($event)"
-      (deleteToCart)="onDeleteTo($event)" (updateToCart)="onUpdateTo($event)"></app-product-item>
+      (deleteToCart)="onDeleteTo($event)" (updateToCart)="onUpdateTo($event)"
+      [routerLink]="['/product', item.id]"></app-product-item>
     }
   </div>
 

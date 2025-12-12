@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-slate-950 text-slate-50">
   <div class="mx-auto max-w-6xl px-4 py-6">
 
-    <!-- Migas / volver -->
+    <!-- Migas -->
     <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
       <a routerLink="/catalog" class="hover:text-slate-100">Catálogo</a>
       <span>/</span>
@@ -10,16 +10,26 @@
 
     @if (product(); as product) {
 
-    <div class="grid gap-8 items-start lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <!-- Layout principal: móvil = una columna, lg = dos columnas -->
+    <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
 
-      <!-- IZQUIERDA: imagen + descripción larga -->
+      <!-- IZQUIERDA: imagen + descripción -->
       <section class="space-y-4 min-w-0">
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-4 flex items-center justify-center">
-          <img class="max-h-96 w-full object-contain rounded-xl" [src]="product.image" [alt]="product.title" />
+        <!-- Imagen principal -->
+        <div
+          class="rounded-2xl border border-slate-800 bg-slate-900 p-4
+                 flex items-center justify-center">
+          <img
+            class="max-h-96 w-full object-contain rounded-xl"
+            [src]="product.image"
+            [alt]="product.title">
         </div>
 
-        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-300 leading-relaxed">
+        <!-- Descripción larga -->
+        <div
+          class="rounded-2xl border border-slate-800 bg-slate-900 p-5
+                 text-sm text-slate-300 leading-relaxed">
           <h2 class="mb-2 text-base font-semibold text-slate-100">
             Descripción
           </h2>
@@ -30,8 +40,10 @@
 
       </section>
 
-      <!-- DERECHA: resumen + compra rápida -->
-      <aside class="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-5 min-w-0">
+      <!-- DERECHA: resumen + UI de compra (solo diseño) -->
+      <aside
+        class="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-5
+               min-w-0">
 
         <p class="text-xs uppercase tracking-wide text-slate-400">
           {{ product.category }}
@@ -50,7 +62,7 @@
           </span>
         </div>
 
-        <!-- rating “fake” por ahora -->
+        <!-- rating “fake” -->
         <div class="flex items-center gap-2 text-xs text-slate-400">
           <span class="material-symbols-outlined text-amber-400 text-base">
             star
@@ -60,47 +72,53 @@
           <span>128 opiniones</span>
         </div>
 
-        <!-- formulario cantidad + añadir -->
-        <form [formGroup]="form" class="mt-4 space-y-4">
-
+        <!-- Cantidad + botones (solo UI por ahora) -->
+        <div class="mt-4 space-y-4">
           <div class="flex items-center gap-3">
             <label class="text-xs text-slate-300">
               Cantidad
             </label>
 
-            <div class="inline-flex items-center gap-2 rounded-full bg-slate-800 px-2 py-1 border border-slate-700">
-              <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full
-                         bg-slate-900 text-slate-100 text-sm
-                         hover:bg-slate-700 active:scale-95 transition" (click)="decreaseCount()">
+            <div
+              class="inline-flex items-center gap-2 rounded-full bg-slate-800
+                     px-2 py-1 border border-slate-700">
+              <button type="button"
+                class="flex h-7 w-7 items-center justify-center rounded-full
+                       bg-slate-900 text-slate-100 text-sm
+                       hover:bg-slate-700 active:scale-95 transition">
                 −
               </button>
 
-              <input type="number" min="1" formControlName="amount"
-                class="w-12 text-center bg-transparent text-sm focus:outline-none" />
+              <span class="w-10 text-center text-sm">
+                1
+              </span>
 
-              <button type="button" class="flex h-7 w-7 items-center justify-center rounded-full
-                         bg-slate-900 text-slate-100 text-sm
-                         hover:bg-slate-700 active:scale-95 transition" (click)="increaseCount()">
+              <button type="button"
+                class="flex h-7 w-7 items-center justify-center rounded-full
+                       bg-slate-900 text-slate-100 text-sm
+                       hover:bg-slate-700 active:scale-95 transition">
                 +
               </button>
             </div>
           </div>
 
-          <button type="button" (click)="onAdd()" class="flex w-full items-center justify-center rounded-full
-                     bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950
-                     hover:bg-emerald-400 active:scale-[0.98] transition">
+          <!-- Botones acción (el click lo conectaremos después) -->
+          <button type="button"
+            class="flex w-full items-center justify-center rounded-full
+                   bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950
+                   hover:bg-emerald-400 active:scale-[0.98] transition">
             Añadir al carrito
           </button>
 
-          <button type="button" routerLink="/catalog" class="flex w-full items-center justify-center rounded-full
-                     border border-slate-600 px-4 py-2 text-xs font-medium
-                     text-slate-200 hover:bg-slate-800">
+          <button type="button" routerLink="/catalog"
+            class="flex w-full items-center justify-center rounded-full
+                   border border-slate-600 px-4 py-2 text-xs font-medium
+                   text-slate-200 hover:bg-slate-800">
             Volver al catálogo
           </button>
+        </div>
 
-        </form>
-
-        <!-- detalles extra “de relleno” -->
+        <!-- Texto extra -->
         <div class="border-t border-slate-800 pt-4 text-xs text-slate-400 space-y-1">
           <p>• Envío estándar en 3–5 días hábiles.</p>
           <p>• Devoluciones gratuitas dentro de los 30 días.</p>
@@ -108,15 +126,48 @@
         </div>
 
       </aside>
-
     </div>
+
+    <!-- Productos relacionados -->
+    <section class="mt-10">
+      <h2 class="mb-3 text-sm font-semibold">En esta categoría</h2>
+
+      @if (relatedProducts().length) {
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        @for (rp of relatedProducts(); track rp.id) {
+        <a
+          class="block rounded-xl border border-slate-800 bg-slate-900 p-3
+                 hover:border-emerald-500 hover:bg-slate-800 transition-colors"
+          [routerLink]="['/product', rp.id]">
+          <img
+            class="mb-2 h-24 w-full rounded-lg object-cover"
+            [src]="rp.image"
+            [alt]="rp.title">
+          <p class="text-xs font-medium line-clamp-2">
+            {{ rp.title }}
+          </p>
+          <p class="mt-1 text-xs text-emerald-400">
+            {{ rp.price | currency }}
+          </p>
+        </a>
+        }
+      </div>
+      } @else {
+      <p class="mt-2 text-xs text-slate-500">
+        No hay otros productos en esta categoría.
+      </p>
+      }
+    </section>
 
     } @else {
-    <!-- skeleton simple mientras se carga / si no hay producto -->
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-sm text-slate-400">
+
+    <!-- Skeleton mientras no hay producto -->
+    <div
+      class="rounded-2xl border border-slate-800 bg-slate-900 p-8
+             text-sm text-slate-400">
       Cargando producto…
     </div>
-    }
 
+    }
   </div>
 </div>

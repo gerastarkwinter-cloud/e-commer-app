@@ -11,7 +11,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 
 import { CategoryGroup, Product } from '../../../domain';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
-import { pipe } from 'rxjs';
+import { EMPTY, pipe } from 'rxjs';
 import { tapResponse } from '@ngrx/operators'
 import { debounceTime, groupBy, switchMap, tap } from 'rxjs/operators';
 
@@ -43,59 +43,84 @@ export const CatalogStore = signalStore(
         totalProducts: () => products().length,
     })),
     withMethods((store, repo = inject(ProductRepository)) => ({
+
         loadCatalogFull: rxMethod<void>(
             pipe(
                 tap(() => {
-                    console.log('Cargando productos...');
+                    if (store.products().length) {
+                        return;
+                    }
                     patchState(store, { loading: true, error: null });
-                }
-                ),
-                switchMap(() => {
-                    return repo.getAll()
-                        .pipe(
-                            tapResponse({
-                                next: (catalogDetails) => {
-                                    console.log('Productos cargados:', catalogDetails);
-                                    patchState(store, {
-                                        products: catalogDetails.products,
-                                        categories: catalogDetails.categories,
-                                        prodcutGroupBycategory: catalogDetails.productGroupByCategory,
-                                        selectedProduct: null,
-                                        loading: false
-                                    });
-                                },
-                                error: (error) => {
-                                    console.error('Error al cargar productos:', error);
-                                    patchState(store, { error: 'Error al cargar productos', loading: false });
-                                }
-                            })
-                        )
                 }),
+                switchMap(() => {
+                    if (store.products().length) {
+                        return EMPTY;
+                    }
 
-            )),
+                    return repo.getAll().pipe(
+                        tapResponse({
+                            next: (catalogDetails) => {
+                                patchState(store, {
+                                    products: catalogDetails.products,
+                                    categories: catalogDetails.categories,
+                                    prodcutGroupBycategory: catalogDetails.productGroupByCategory,
+                                    selectedProduct: null,
+                                    loading: false,
+                                });
+                            },
+                            error: (error) => {
+                                console.error('Error al cargar productos:', error);
+                                patchState(store, {
+                                    error: 'Error al cargar productos',
+                                    loading: false,
+                                });
+                            },
+                        })
+                    );
+                }),
+            )
+        ),
         loadProductById: rxMethod<number>(
             pipe(
-                tap(() => {
-                    console.log('Cargando producto por ID...');
-                    patchState(store, { loading: true, error: null });
+                tap((id) => {
+                    const fromStore = store.products().find(p => p.id === id);
+
+                    if (fromStore) {
+                        patchState(store, {
+                            selectedProduct: fromStore,
+                            loading: false,
+                            error: null,
+                        });
+                    } else {
+                        patchState(store, { loading: true, error: null });
+                    }
                 }),
                 switchMap((id) => {
-                    return repo.getById(id)
-                        .pipe(
-                            tapResponse({
-                                next: (product) => {
-                                    console.log('Producto cargado:', product);
-                                    patchState(store, {
-                                        selectedProduct: product,
-                                        loading: false
-                                    });
-                                },
-                                error: (error) => {
-                                    console.error('Error al cargar el producto:', error);
-                                    patchState(store, { error: 'Error al cargar el producto', loading: false });
-                                }
-                            })
-                        )
-                })
-            )),
-    })));
+                    const fromStore = store.products().find(p => p.id === id);
+                    if (fromStore) {
+                        return EMPTY; 
+                    }
+
+                    return repo.getById(id).pipe(
+                        tapResponse({
+                            next: (product) => {
+                                patchState(store, {
+                                    selectedProduct: product,
+                                    loading: false,
+                                });
+                            },
+                            error: (error) => {
+                                console.error('Error al cargar el producto:', error);
+                                patchState(store, {
+                                    error: 'Error al cargar el producto',
+                                    loading: false,
+                                });
+                            },
+                        })
+                    );
+                }),
+            )
+        ),
+
+    }))
+);

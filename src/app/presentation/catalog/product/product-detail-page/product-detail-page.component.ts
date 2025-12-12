@@ -1,86 +1,74 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CartStore, CatalogStore } from '../../../../application';
+
+import { CatalogStore } from '../../../../application';
 import { Product } from '../../../../domain';
-
-
 
 @Component({
   selector: 'app-product-detail-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './product-detail-page.component.html',
 })
 export class ProductDetailPageComponent {
 
   private readonly route = inject(ActivatedRoute);
   private readonly catalogStore = inject(CatalogStore);
-  private readonly cartStore = inject(CartStore);
-  private readonly fb = inject(FormBuilder);
 
-  // id del producto desde la ruta
+  // signals del catálogo
+  readonly products = this.catalogStore.products;
+  readonly selectedProduct = this.catalogStore.selectedProduct;
+
+  // id que viene de la ruta
   readonly productId = computed(() => {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    return idParam ? Number(idParam) : null;
+    const param = this.route.snapshot.paramMap.get('id');
+    return param ? Number(param) : null;
   });
 
-  // catálogo ya cargado en memoria
-  readonly products = this.catalogStore.products;
-
-  // producto actual (o null si aún no está)
+  /**
+   * Producto actual:
+   * 1) intenta sacarlo del listado del catálogo
+   * 2) si no está, usa selectedProduct() (lo rellenará loadProductById)
+   */
   readonly product = computed<Product | null>(() => {
     const id = this.productId();
+    if (id == null) return null;
+
     const list = this.products();
-    if (id == null || !list?.length) return null;
-    return list.find(p => p.id === id) ?? null;
+    const fromList = list.find(p => p.id === id);
+    if (fromList) return fromList;
+
+    return this.selectedProduct();
   });
 
-  // form cantidad
-  readonly form = this.fb.nonNullable.group({
-    amount: [1, [Validators.required, Validators.min(1)]],
-  });
+  // productos relacionados: misma categoría, distinto id
+  readonly relatedProducts = computed<Product[]>(() => {
+    const current = this.product();
+    const list = this.products();
+    if (!current || !list?.length) return [];
 
-  private get amountCtrl() {
-    return this.form.controls.amount;
-  }
+    return list
+      .filter(p => p.category === current.category && p.id !== current.id)
+      .slice(0, 6); // máximo 6 relacionados
+  });
 
   constructor() {
-    // por si llegas directo al detalle sin pasar por catálogo
-    this.catalogStore.loadCatalogFull();
-  }
+    const id = this.productId();
 
-  increaseCount() {
-    const current = this.amountCtrl.value;
-    this.amountCtrl.setValue(current + 1);
-  }
-
-  decreaseCount() {
-    const current = this.amountCtrl.value;
-    this.amountCtrl.setValue(current > 1 ? current - 1 : 1);
-  }
-
-  onAdd() {
-    const p = this.product();
-    if (!p || this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
+    // si no está en el catálogo, lo pido por id
+    if (id != null) {
+      const list = this.products();
+      const exists = list.some(p => p.id === id);
+      if (!exists) {
+        this.catalogStore.loadProductById(id);
+      }
     }
 
-    const quantity = this.amountCtrl.value;
-    const userId = 1; // TODO userStore cuando exista
-
-    const cartInput = {
-      id: this.cartStore.id(),          // null si aún no hay carrito
-      userId,
-      items: [{ productId: p.id, quantity }],
-    };
-
-    if (cartInput.id) {
-      this.cartStore.addItemToCart(cartInput);
-    } else {
-      this.cartStore.saveCart(cartInput);
+    // si entras directo al detalle y el catálogo está vacío,
+    // cargo el catálogo en paralelo (para la sección de relacionados)
+    if (!this.products().length) {
+      this.catalogStore.loadCatalogFull();
     }
   }
 }
