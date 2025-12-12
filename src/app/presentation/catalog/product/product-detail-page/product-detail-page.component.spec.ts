@@ -1,21 +1,20 @@
 /* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ProductDetailPageComponent } from './product-detail-page.component';
 
-import { CartPageComponent } from './cart-page.component';
-
-describe('CartPageComponent', () => {
-  let component: CartPageComponent;
-  let fixture: ComponentFixture<CartPageComponent>;
+describe('ProductDetailsComponent', () => {
+  let component: ProductDetailPageComponent;
+  let fixture: ComponentFixture<ProductDetailPageComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CartPageComponent]
+      declarations: [ProductDetailPageComponent]
     })
       .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CartPageComponent);
+    fixture = TestBed.createComponent(ProductDetailPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

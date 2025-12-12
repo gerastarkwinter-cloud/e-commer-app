@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { ProductItemComponent } from "../product-item/product-item.component";
-import { Cart, Product } from '../../../../domain';
+import { Product } from '../../../../domain';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, ProductItemComponent],
+  imports: [CommonModule, ProductItemComponent, RouterLink],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })

@@ -1,18 +1,56 @@
-<header class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-  <a routerLink="/catalog" class="text-lg font-semibold">
-    {{ title() }}
+<header class="flex items-center justify-between px-6 py-4 border-b border-slate-800
+         bg-slate-950/90 backdrop-blur sticky top-0">
+  <!-- Marca / logo -->
+  <a routerLink="/catalog" class="flex items-center gap-2 text-lg font-semibold tracking-tight">
+    <span
+      class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 text-sm font-bold">
+      G
+    </span>
+    <span class="hidden sm:inline">
+      {{ title() | slice:1}}
+    </span>
   </a>
 
-  <nav class="flex items-center gap-4">
-    <a routerLink="/catalog" routerLinkActive="font-bold">Catálogo</a>
+  <nav class="flex items-center gap-2 text-sm">
+    <a routerLink="/catalog" routerLinkActive="bg-slate-800 text-slate-50" class="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+             border border-slate-700 bg-slate-900/80 text-slate-100
+             hover:border-emerald-500 hover:bg-slate-900
+             transition-colors">
+      <span class="material-symbols-outlined text-base">
+        book
+      </span>
+      <span class="hidden sm:inline text-xs font-medium">
+        Catálogo
+      </span>
+    </a>
 
-    <a routerLink="/cart" routerLinkActive="font-bold" class="relative flex items-center gap-1">
-      <span class="material-symbols-outlined">shopping_cart</span>
+    <a routerLink="/cart" class="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+             border border-slate-700 bg-slate-900/80 text-slate-100
+             hover:border-emerald-500 hover:bg-slate-900
+             transition-colors">
+      <span class="material-symbols-outlined text-base">
+        shopping_cart
+      </span>
+
+      <span class="hidden sm:inline text-xs font-medium">
+        Mi carrito
+      </span>
+
       @if (items() > 0) {
-      <span class="relative -top-2 right-3 inline-flex items-center justify-center min-w-[1.4rem] px-1 rounded-full bg-red-600 text-xs min-h-[1.4rem] cursor-pointer">
+      <span class="absolute -top-1 -right-1 inline-flex min-w-[1.1rem] min-h-[1.1rem]
+                 items-center justify-center rounded-full bg-red-600
+                 text-[0.65rem] font-semibold leading-none">
         {{ items() }}
       </span>
       }
     </a>
+    <button type="button" class="ml-2 inline-flex h-8 w-8 items-center justify-center
+           rounded-full border border-slate-700 bg-slate-900
+           text-xs font-semibold text-emerald-300
+           hover:border-emerald-400 hover:bg-slate-800
+           transition-colors">
+      {{ userInitial() }}
+    </button>
   </nav>
+
 </header>

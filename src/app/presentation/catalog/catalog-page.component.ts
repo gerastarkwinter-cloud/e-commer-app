@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { CartStore, CatalogStore } from '../../application';
-import { ProductListComponent } from "../../shared/components/product/product-list/product-list.component";
 import { Cart } from '../../domain';
+import { ProductListComponent } from './product/product-list/product-list.component';
 
 @Component({
   selector: 'app-catalog',
@@ -35,13 +35,19 @@ export class CatalogPageComponent implements OnInit {
       quantity
     }]
     const cartItem: Cart = {
-      id: null,
+      id: this.cartStore.id(),
       userId: userId,
       items: productsAdd || []
     }
-    this.cartStore.addItemToCart(cartItem);
-  }
 
+    console.log(cartItem);
+    console.log('Ver valor de cart item cuando toma su primer id: ', cartItem);
+    if (cartItem.id) {
+      this.cartStore.addItemToCart(cartItem);
+    } else {
+      this.cartStore.saveCart(cartItem);
+    }
+  }
 
   UpdateItemToCart(event: any) {
     let productId: number = event.productId;

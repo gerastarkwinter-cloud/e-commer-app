@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { CatalogPageComponent } from './presentation/catalog/catalog-page.component';
 
 export const appRoutes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: 'catalog' },
@@ -7,13 +6,13 @@ export const appRoutes: Routes = [
         path: 'catalog', /* component: CatalogPageComponent, */
         loadComponent: () => import('./presentation/catalog/catalog-page.component').then(m => m.CatalogPageComponent)
     },
-    // {
-    //     path: 'cart', /* component: CartPageComponent */
-    //     loadComponent: () => import('./presentation/cart/cart-page.component').then(m => m.CartPageComponent)
-    // },
-    // {
-    //     path: 'product/:id',
-    //     loadComponent: () => import('./presentation/product-detail/product-detail-page.component').then(m => m.ProductDetailPageComponent)
-    // },
+    {
+        path: 'cart', /* component: CartPageComponent */
+        loadComponent: () => import('./presentation/cart/cart-page.component').then(m => m.CartPageComponent)
+    },
+    {
+        path: 'product/:id',
+        loadComponent: () => import('./presentation/catalog/product/product-detail-page/product-detail-page.component').then(m => m.ProductDetailPageComponent)
+    },
     { path: '**', redirectTo: 'catalog' },
 ];
