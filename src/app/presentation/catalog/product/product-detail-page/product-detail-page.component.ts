@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import {  Component, computed, effect, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CatalogStore } from '../../../../application';
 import { Product } from '../../../../domain';
@@ -16,21 +16,15 @@ export class ProductDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly catalogStore = inject(CatalogStore);
 
-  // signals del catálogo
   readonly products = this.catalogStore.products;
   readonly selectedProduct = this.catalogStore.selectedProduct;
 
-  // id que viene de la ruta
   readonly productId = computed(() => {
     const param = this.route.snapshot.paramMap.get('id');
     return param ? Number(param) : null;
   });
 
-  /**
-   * Producto actual:
-   * 1) intenta sacarlo del listado del catálogo
-   * 2) si no está, usa selectedProduct() (lo rellenará loadProductById)
-   */
+
   readonly product = computed<Product | null>(() => {
     const id = this.productId();
     if (id == null) return null;
@@ -50,25 +44,30 @@ export class ProductDetailPageComponent {
 
     return list
       .filter(p => p.category === current.category && p.id !== current.id)
-      .slice(0, 6); // máximo 6 relacionados
+      .slice(0, 6);
   });
 
   constructor() {
-    const id = this.productId();
+    // 1) reaccionar a cambios de /product/:id
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      const id = idParam ? Number(idParam) : null;
 
-    // si no está en el catálogo, lo pido por id
-    if (id != null) {
-      const list = this.products();
-      const exists = list.some(p => p.id === id);
-      if (!exists) {
+      if (id != null) {
         this.catalogStore.loadProductById(id);
       }
-    }
+    });
 
-    // si entras directo al detalle y el catálogo está vacío,
-    // cargo el catálogo en paralelo (para la sección de relacionados)
+    // 2) asegurar catálogo cargado para relacionados
     if (!this.products().length) {
       this.catalogStore.loadCatalogFull();
     }
+
+    // 3) sincronizar input de cantidad con lo que haya en el carrito
+    // effect(() => {
+    //   const ammount = this.cartQuantity();
+    //   this.amountCtrl.setValue(qty, { emitEvent: false });
+    // });
   }
+
 }
