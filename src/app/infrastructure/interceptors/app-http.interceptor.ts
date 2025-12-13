@@ -9,6 +9,7 @@ import { throwError } from 'rxjs';
 import { AppError } from '../../domain/models/app-error.model';
 import { ANotificationService } from '../../domain';
 import { AuthStore } from '../../application';
+import { LoggerService } from './../services';
 
 const mapHttpError = (err: HttpErrorResponse): AppError => {
     let message = 'Ha ocurrido un error inesperado. Inténtalo más tarde.';
@@ -35,6 +36,7 @@ const mapHttpError = (err: HttpErrorResponse): AppError => {
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
     const notification = inject(ANotificationService);
     const autUser = inject(AuthStore);
+    const logger = inject(LoggerService);
 
     const cloned = req.clone({
         setHeaders: {
@@ -47,6 +49,7 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error: HttpErrorResponse) => {
             const errorMapped = mapHttpError(error);
             notification.error(errorMapped.message);
+            logger.capture(error, 'error', { feature: 'auth', action: 'login', errorMapped });
             return throwError(() => errorMapped);
         })
     );

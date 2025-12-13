@@ -104,6 +104,7 @@ export const AuthStore = signalStore(
         ),
         logOut: () => {
             localStorage.removeItem('auth_token');
+            localStorage.removeItem('profile');
             patchState(store, { ...initialState });
         }
     })
