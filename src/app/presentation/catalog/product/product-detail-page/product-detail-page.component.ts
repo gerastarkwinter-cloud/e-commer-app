@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import {  Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { CatalogStore } from '../../../../application';
-import { Product } from '../../../../domain';
+import { CartStore, CatalogStore } from '../../../../application';
+import { Cart, Product, RatingProduct } from '../../../../domain';
+import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 
 @Component({
   selector: 'app-product-detail-page',
@@ -15,22 +16,23 @@ export class ProductDetailPageComponent {
 
   private readonly route = inject(ActivatedRoute);
   private readonly catalogStore = inject(CatalogStore);
+  private readonly cartStore = inject(CartStore);
 
   readonly products = this.catalogStore.products;
   readonly selectedProduct = this.catalogStore.selectedProduct;
+  readonly isLoading = this.catalogStore.loading;
 
-  readonly productId = computed(() => {
-    const param = this.route.snapshot.paramMap.get('id');
-    return param ? Number(param) : null;
-  });
+  private readonly routeId = signal<number | null>(null);
+  readonly updatingQuantity = signal(false);
 
+  readonly productId = computed(() => this.routeId());
+  readonly product = computed<RatingProduct | null>(() => {
 
-  readonly product = computed<Product | null>(() => {
     const id = this.productId();
     if (id == null) return null;
 
     const list = this.products();
-    const fromList = list.find(p => p.id === id);
+    let fromList = list.find(p => p.id === id);
     if (fromList) return fromList;
 
     return this.selectedProduct();
@@ -47,8 +49,27 @@ export class ProductDetailPageComponent {
       .slice(0, 6);
   });
 
+  readonly quantityProductSelected = signal<number>(0);
+
   constructor() {
-    // 1) reaccionar a cambios de /product/:id
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      const id = idParam ? Number(idParam) : null;
+
+      this.routeId.set(id);
+
+      if (id != null) {
+        this.catalogStore.loadProductById(id);
+      }
+    });
+    effect(() => {
+      const product = this.product();
+      const items = this.cartStore.items();
+      const found = items.find(i => i.productId === product!.id);
+      const quantity = found?.quantity ?? 1;
+      this.quantityProductSelected.set(quantity);
+    });
+
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
       const id = idParam ? Number(idParam) : null;
@@ -58,16 +79,54 @@ export class ProductDetailPageComponent {
       }
     });
 
-    // 2) asegurar catálogo cargado para relacionados
     if (!this.products().length) {
       this.catalogStore.loadCatalogFull();
     }
 
-    // 3) sincronizar input de cantidad con lo que haya en el carrito
-    // effect(() => {
-    //   const ammount = this.cartQuantity();
-    //   this.amountCtrl.setValue(qty, { emitEvent: false });
-    // });
+  }
+
+  increaseCount() {
+    if (this.updatingQuantity()) return;
+
+    this.updatingQuantity.set(true);
+    const next = this.quantityProductSelected() + 1;
+    this.quantityProductSelected.set(next);
+    this.AddToCart();
+    setTimeout(() => {
+      this.updatingQuantity.set(false);
+    }, UPDATE_DELAY_MS);
+  }
+
+  decreaseCount() {
+    if (this.updatingQuantity()) return;
+    const current = this.quantityProductSelected();
+    const next = current > 1 ? current - 1 : 1;
+    this.updatingQuantity.set(true);
+    this.quantityProductSelected.set(next);
+    this.AddToCart();
+    setTimeout(() => {
+      this.updatingQuantity.set(false);
+    }, UPDATE_DELAY_MS);
+  }
+
+
+  AddToCart() {
+    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const productsAdd = [{
+      productId: this.productId() as number,
+      quantity: this.quantityProductSelected()
+    }]
+    const cartItem: Cart = {
+      id: this.cartStore.id(),
+      userId: userId,
+      items: productsAdd || []
+    }
+
+    if (cartItem.id) {
+      this.cartStore.addItemToCart(cartItem);
+    } else {
+      this.cartStore.saveCart(cartItem);
+    }
   }
 
 }

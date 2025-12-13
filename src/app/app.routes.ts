@@ -14,5 +14,9 @@ export const appRoutes: Routes = [
         path: 'product/:id',
         loadComponent: () => import('./presentation/catalog/product/product-detail-page/product-detail-page.component').then(m => m.ProductDetailPageComponent)
     },
+    {
+        path: 'checkout',
+        loadComponent: () => import('./presentation/cart/components/cart-checkout/cart-check-out.component').then(m => m.CartCheckOutComponent)
+    },
     { path: '**', redirectTo: 'catalog' },
 ];

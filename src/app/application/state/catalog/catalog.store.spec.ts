@@ -4,7 +4,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 import { CatalogStore } from './catalog.store';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
-import { Product } from '../../../domain';
+import { RatingProduct } from '../../../domain';
 import { of, throwError } from 'rxjs';
 import { ProductRepositoryMock } from './ProductRepositoryMock';
 
@@ -43,13 +43,17 @@ describe('CatalogStore', () => {
     });
 
     it('debería cargar un producto dado su Id', () => {
-        const mockProduct: Product = {
+        const mockProduct: RatingProduct = {
             id: 1,
             title: 'P1',
             price: 10,
             description: 'd1',
             category: 'electronics',
             image: 'http://example.com/1',
+            rating: {
+                rate: 3.9,
+                count: 120
+            }
         };
 
         repo.getById.and.returnValue(of(mockProduct));

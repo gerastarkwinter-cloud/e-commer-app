@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { CatalogDetails, Product } from '../../../domain';
+import { CatalogDetails, Product, RatingProduct } from '../../../domain';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
 
 declare const jasmine: any;
@@ -15,7 +15,11 @@ export class ProductRepositoryMock extends ProductRepository {
                     description: 'd1',
                     category: 'electronics',
                     image: 'img1',
-                } as Product,
+                    rating: {
+                        rate: 3.9,
+                        count: 120
+                    }
+                } as RatingProduct,
             ],
             categories: ['electronics'],
             productGroupByCategory: [
@@ -29,7 +33,11 @@ export class ProductRepositoryMock extends ProductRepository {
                             description: 'd1',
                             category: 'electronics',
                             image: 'img1',
-                        } as Product,
+                            rating: {
+                                rate: 3.9,
+                                count: 120
+                            }
+                        } as RatingProduct,
                     ],
                 },
             ],

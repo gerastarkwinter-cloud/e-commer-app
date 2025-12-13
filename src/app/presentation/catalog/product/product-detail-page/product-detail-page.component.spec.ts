@@ -4,220 +4,251 @@ import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/route
 import { BehaviorSubject } from 'rxjs';
 
 import { ProductDetailPageComponent } from './product-detail-page.component';
-import { CatalogStore } from '../../../../application';
+import { CartStore, CatalogStore } from '../../../../application';
 import { Product } from '../../../../domain';
+import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 
 class CatalogStoreMock {
-    readonly products = signal<Product[]>([]);
-    readonly selectedProduct = signal<Product | null>(null);
+  readonly products = signal<Product[]>([]);
+  readonly selectedProduct = signal<any>(null);
 
-    loadCatalogFull = jasmine.createSpy('loadCatalogFull');
-    loadProductById = jasmine.createSpy('loadProductById');
+  loadCatalogFull = jasmine.createSpy('loadCatalogFull');
+  loadProductById = jasmine.createSpy('loadProductById');
+}
+
+class CartStoreMock {
+  readonly items = signal<any[]>([]);
 }
 
 describe('ProductDetailPageComponent', () => {
-    let catalogStore: CatalogStoreMock;
-    let paramMap$: BehaviorSubject<any>;
+  let catalogStore: CatalogStoreMock;
+  let cartStore: CartStoreMock;
 
-    const makeRouteMock = (id: number | null) => {
-        paramMap$ = new BehaviorSubject(convertToParamMap(id == null ? {} : { id: String(id) }));
+  let paramMap$: BehaviorSubject<any>;
 
-        return {
-            snapshot: { paramMap: convertToParamMap(id == null ? {} : { id: String(id) }) },
-            paramMap: paramMap$.asObservable(),
-        } as any as ActivatedRoute;
-    };
+  const makeRouteMock = (id: number | null) => {
+    paramMap$ = new BehaviorSubject(convertToParamMap(id == null ? {} : { id: String(id) }));
 
-    const p = (id: number, category = 'cat'): Product =>
+    return {
+      snapshot: { paramMap: convertToParamMap(id == null ? {} : { id: String(id) }) },
+      paramMap: paramMap$.asObservable(),
+    } as any as ActivatedRoute;
+  };
+
+  const p = (id: number, category = 'cat'): Product =>
     ({
-        id,
-        title: `P${id}`,
-        description: `D${id}`,
-        price: id,
-        image: `img${id}.png`,
-        category,
+      id,
+      title: `P${id}`,
+      description: `D${id}`,
+      price: id,
+      image: `img${id}.png`,
+      category,
     } as any as Product);
 
-    beforeEach(() => {
-        catalogStore = new CatalogStoreMock();
+  const setupRoute = (id: number) => {
+    TestBed.overrideProvider(ActivatedRoute, { useValue: makeRouteMock(id) });
+    catalogStore.selectedProduct.set(p(id));
+  };
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: makeRouteMock(1) },
-            ],
-        });
+  beforeEach(() => {
+    jasmine.clock().install();
+
+    catalogStore = new CatalogStoreMock();
+    cartStore = new CartStoreMock();
+
+    // defaults seguros
+    catalogStore.selectedProduct.set(p(1));
+
+    TestBed.configureTestingModule({
+      imports: [ProductDetailPageComponent],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+
+        { provide: CatalogStore, useValue: catalogStore },
+        { provide: CartStore, useValue: cartStore },
+        { provide: ActivatedRoute, useValue: makeRouteMock(1) },
+      ],
     });
+  });
 
-    it('debería crear el componente', () => {
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        const component = fixture.componentInstance;
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
 
-        fixture.detectChanges();
+  it('debería crear el componente', () => {
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-        expect(component).toBeTruthy();
-    });
+    fixture.detectChanges();
 
-    it('debería llamar loadCatalogFull si products está vacío', () => {
-        catalogStore.products.set([]);
+    expect(component).toBeTruthy();
+  });
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        fixture.detectChanges();
+  it('debería llamar loadCatalogFull si products está vacío', () => {
+    catalogStore.products.set([]);
 
-        expect(catalogStore.loadCatalogFull).toHaveBeenCalled();
-    });
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    fixture.detectChanges();
 
-    it('NO debería llamar loadCatalogFull si ya hay products', () => {
-        catalogStore.products.set([p(1), p(2)]);
+    expect(catalogStore.loadCatalogFull).toHaveBeenCalled();
+  });
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        fixture.detectChanges();
+  it('NO debería llamar loadCatalogFull si ya hay products', () => {
+    catalogStore.products.set([p(1), p(2)]);
 
-        expect(catalogStore.loadCatalogFull).not.toHaveBeenCalled();
-    });
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    fixture.detectChanges();
 
-    it('debería llamar loadProductById con el id del paramMap', () => {
-        TestBed.resetTestingModule();
+    expect(catalogStore.loadCatalogFull).not.toHaveBeenCalled();
+  });
 
-        catalogStore = new CatalogStoreMock();
+  it('debería llamar loadProductById con el id del paramMap', () => {
+    setupRoute(7);
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: makeRouteMock(7) },
-            ],
-        });
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    fixture.detectChanges();
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        fixture.detectChanges();
+    expect(catalogStore.loadProductById).toHaveBeenCalledWith(7);
+  });
 
-        expect(catalogStore.loadProductById).toHaveBeenCalledWith(7);
-    });
+  it('debería volver a llamar loadProductById si cambia el paramMap', () => {
+    setupRoute(3);
 
-    it('debería volver a llamar loadProductById si cambia el paramMap', () => {
-        TestBed.resetTestingModule();
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    fixture.detectChanges();
 
-        catalogStore = new CatalogStoreMock();
-        const route = makeRouteMock(3);
+    expect(catalogStore.loadProductById).toHaveBeenCalledWith(3);
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: route },
-            ],
-        });
+    paramMap$.next(convertToParamMap({ id: '4' }));
+    fixture.detectChanges();
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        fixture.detectChanges();
+    expect(catalogStore.loadProductById).toHaveBeenCalledWith(4);
+    expect(catalogStore.loadProductById.calls.count()).toBe(2);
+  });
 
-        expect(catalogStore.loadProductById).toHaveBeenCalledWith(3);
+  it('product: debería salir desde products si existe en la lista', () => {
+    setupRoute(2);
 
-        paramMap$.next(convertToParamMap({ id: '4' }));
-        fixture.detectChanges();
+    catalogStore.products.set([p(1), p(2), p(3)]);
+    catalogStore.selectedProduct.set(p(999));
 
-        expect(catalogStore.loadProductById).toHaveBeenCalledWith(4);
-        expect(catalogStore.loadProductById.calls.count()).toBe(2);
-    });
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-    it('product: debería salir desde products si existe en la lista', () => {
-        TestBed.resetTestingModule();
+    fixture.detectChanges();
 
-        catalogStore = new CatalogStoreMock();
-        const route = makeRouteMock(2);
+    expect(component.product()?.id).toBe(2);
+  });
 
-        catalogStore.products.set([p(1), p(2), p(3)]);
-        catalogStore.selectedProduct.set(p(999));
+  it('product: debería salir desde selectedProduct si no está en la lista', () => {
+    setupRoute(10);
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: route },
-            ],
-        });
+    catalogStore.products.set([p(1), p(2)]);
+    catalogStore.selectedProduct.set(p(10));
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        const component = fixture.componentInstance;
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-        fixture.detectChanges();
+    fixture.detectChanges();
 
-        expect(component.product()?.id).toBe(2);
-    });
+    expect(component.product()?.id).toBe(10);
+  });
 
-    it('product: debería salir desde selectedProduct si no está en la lista', () => {
-        TestBed.resetTestingModule();
+  it('relatedProducts: misma categoría, distinto id, máximo 6', () => {
+    setupRoute(1);
 
-        catalogStore = new CatalogStoreMock();
-        const route = makeRouteMock(10);
+    catalogStore.products.set([
+      p(1, 'A'),
+      p(2, 'A'),
+      p(3, 'A'),
+      p(4, 'A'),
+      p(5, 'A'),
+      p(6, 'A'),
+      p(7, 'A'),
+      p(8, 'B'),
+    ]);
 
-        catalogStore.products.set([p(1), p(2)]);
-        catalogStore.selectedProduct.set(p(10));
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: route },
-            ],
-        });
+    fixture.detectChanges();
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        const component = fixture.componentInstance;
+    const related = component.relatedProducts();
+    expect(related.length).toBe(6);
+    expect(related.some(x => x.id === 1)).toBeFalse();
+    expect(related.every(x => x.category === 'A')).toBeTrue();
+  });
 
-        fixture.detectChanges();
+  it('effect: debería sincronizar quantityProductSelected con el carrito', () => {
+    setupRoute(1);
 
-        expect(component.product()?.id).toBe(10);
-    });
+    cartStore.items.set([{ productId: 1, quantity: 5 }]);
 
-    it('relatedProducts: misma categoría, distinto id, máximo 6', () => {
-        TestBed.resetTestingModule();
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-        catalogStore = new CatalogStoreMock();
-        const route = makeRouteMock(1);
+    fixture.detectChanges();
+    expect(component.quantityProductSelected()).toBe(5);
 
-        const list = [
-            p(1, 'A'),
-            p(2, 'A'),
-            p(3, 'A'),
-            p(4, 'A'),
-            p(5, 'A'),
-            p(6, 'A'),
-            p(7, 'A'),
-            p(8, 'B'),
-        ];
-        catalogStore.products.set(list);
+    cartStore.items.set([{ productId: 1, quantity: 2 }]);
+    fixture.detectChanges();
 
-        TestBed.configureTestingModule({
-            imports: [ProductDetailPageComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-                { provide: CatalogStore, useValue: catalogStore },
-                { provide: ActivatedRoute, useValue: route },
-            ],
-        });
+    expect(component.quantityProductSelected()).toBe(2);
+  });
 
-        const fixture = TestBed.createComponent(ProductDetailPageComponent);
-        const component = fixture.componentInstance;
+  it('increaseCount: debería incrementar con delay y activar updatingQuantity', () => {
+    setupRoute(1);
 
-        fixture.detectChanges();
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
 
-        const related = component.relatedProducts();
-        expect(related.length).toBe(6);
-        expect(related.some(x => x.id === 1)).toBeFalse();
-        expect(related.every(x => x.category === 'A')).toBeTrue();
-    });
+    fixture.detectChanges();
+
+    component.quantityProductSelected.set(1);
+
+    component.increaseCount();
+    expect(component.updatingQuantity()).toBeTrue();
+    expect(component.quantityProductSelected()).toBe(1);
+
+    jasmine.clock().tick(UPDATE_DELAY_MS);
+
+    expect(component.quantityProductSelected()).toBe(2);
+    expect(component.updatingQuantity()).toBeFalse();
+  });
+
+  it('increaseCount: anti-spam (2 clicks rápidos = +1)', () => {
+    setupRoute(1);
+
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    component.quantityProductSelected.set(1);
+
+    component.increaseCount();
+    component.increaseCount();
+
+    jasmine.clock().tick(UPDATE_DELAY_MS);
+
+    expect(component.quantityProductSelected()).toBe(2);
+  });
+
+  it('decreaseCount: no debería bajar de 1', () => {
+    setupRoute(1);
+
+    const fixture = TestBed.createComponent(ProductDetailPageComponent);
+    const component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    component.quantityProductSelected.set(1);
+
+    component.decreaseCount();
+    jasmine.clock().tick(UPDATE_DELAY_MS);
+
+    expect(component.quantityProductSelected()).toBe(1);
+    expect(component.updatingQuantity()).toBeFalse();
+  });
 });

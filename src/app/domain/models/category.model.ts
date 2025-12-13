@@ -1,6 +1,6 @@
-import { Product } from "./product.model";
+import { Product, RatingProduct } from "./product.model";
 
 export interface CategoryGroup {
     category: string;
-    products: Product[];
+    products: RatingProduct[];
 }

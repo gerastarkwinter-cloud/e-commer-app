@@ -6,27 +6,22 @@ import { CartRepository } from "../../../domain/repositories/cart.repository";
 import { throwError } from "rxjs";
 import { ANotificationService, Cart } from "../../../domain";
 import { patchState } from "@ngrx/signals";
-import { NotificationService } from "../../../infrastructure";
-import { NotificationServiceMock } from "./notification.mock";
 
 
 describe('CartStore', () => {
     let store: InstanceType<typeof CartStore>;
     let repo: CartRepositoryMock;
-    let notification: NotificationServiceMock;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             providers: [
                 provideZonelessChangeDetection(),
                 { provide: CartRepository, useClass: CartRepositoryMock },
-                { provide: ANotificationService, useClass: NotificationServiceMock },
                 CartStore,
             ],
         });
         store = TestBed.inject(CartStore);
         repo = TestBed.inject(CartRepository) as CartRepositoryMock;
-        notification = TestBed.inject(ANotificationService);
     });
 
     it
@@ -135,10 +130,6 @@ describe('CartStore', () => {
         expect(store.id()).toBe(1);
         expect(store.userId()).toBe(1);
         expect(store.items()[0].quantity).toBe(2);
-
-        expect(notification.success).toHaveBeenCalledWith(
-            'La orden con número: 1 ha sido enviada satisfactoriamente.'
-        );
     });
 
     it('debería llamar updateCart y actualizar el store si el payload TIENE id ', () => {
@@ -161,9 +152,6 @@ describe('CartStore', () => {
         expect(store.id()).toBe(1);
         expect(store.items()[0].quantity).toBe(4);
 
-        expect(notification.success).toHaveBeenCalledWith(
-            'La orden con número: 1 ha sido enviada satisfactoriamente.'
-        );
     });
 
     it('debería llamar al repo y resetear el store', () => {

@@ -9,21 +9,21 @@ import {
 import { inject } from '@angular/core';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 
-import { CategoryGroup, Product } from '../../../domain';
+import { CategoryGroup, Product, RatingProduct } from '../../../domain';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
 import { EMPTY, pipe } from 'rxjs';
 import { tapResponse } from '@ngrx/operators'
-import { debounceTime, groupBy, switchMap, tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 
 // Definir estado
 export interface CatalogState {
     categories: string[];
     prodcutGroupBycategory: CategoryGroup[];
-    products: Product[];
+    products: RatingProduct[];
     loading: boolean;
     error: null | string;
-    selectedProduct: Product | null;
+    selectedProduct: RatingProduct | null;
 }
 
 // Iniciar estado
@@ -98,7 +98,7 @@ export const CatalogStore = signalStore(
                 switchMap((id) => {
                     const fromStore = store.products().find(p => p.id === id);
                     if (fromStore) {
-                        return EMPTY; 
+                        return EMPTY;
                     }
 
                     return repo.getById(id).pipe(

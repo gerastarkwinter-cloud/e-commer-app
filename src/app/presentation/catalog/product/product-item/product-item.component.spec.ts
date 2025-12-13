@@ -4,6 +4,7 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ProductItemComponent } from './product-item.component';
 import { CartStore } from '../../../../application';
 import { Product } from '../../../../domain';
+import { provideRouter } from '@angular/router';
 
 class CartStoreMock {
     readonly items = signal<any[]>([]);
@@ -27,6 +28,7 @@ describe('ProductItemComponent', () => {
             imports: [ProductItemComponent],
             providers: [
                 provideZonelessChangeDetection(),
+                provideRouter([]),
                 { provide: CartStore, useValue: cartStore },
             ],
         });

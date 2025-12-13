@@ -32,7 +32,7 @@ export const CartStore = signalStore(
         totalItems: () => items().length,
         totalQuantity: () => items().reduce((total, item) => total + item.quantity, 0)
     })),
-    withMethods((store, repo = inject(CartRepository), notification = inject(ANotificationService)) => ({
+    withMethods((store, repo = inject(CartRepository)) => ({
         // Cargar el carrito por usuario
         loadCartByUser: rxMethod<number>(
             pipe(
@@ -84,7 +84,6 @@ export const CartStore = signalStore(
                                     loading: false,
                                     error: null,
                                 });
-                                notification.success(`La orden con número: ${cart.id} ha sido enviada satisfactoriamente.`)
                             },
                             error: (error) => {
                                 console.error('Error al guardar el carrito: ', error);
@@ -137,6 +136,11 @@ export const CartStore = signalStore(
                         const idx = merged.findIndex(i => i.productId === newItem.productId);
                         if (idx === -1) {
                             merged.push(newItem);
+                        } else {
+                            merged[idx] = {
+                                ...merged[idx],
+                                quantity: newItem.quantity
+                            }
                         }
                     }
                     patchState(store, {
