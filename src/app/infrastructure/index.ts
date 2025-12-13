@@ -1,6 +1,6 @@
 export * from './config/notification-ui.model';
-export * from './contract/notification.tokens';
+export * from './config/notification.tokens';
 export * from './contract/segregation.interface';
-// export * from './guards/'
+
 export * from './interceptors/app-http.interceptor';
 export * from './services/index';

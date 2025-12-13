@@ -3,13 +3,12 @@ import {
     withState,
     withMethods,
     withComputed,
-    patchState,
-    withHooks
+    patchState
 } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 
-import { CategoryGroup, Product, RatingProduct } from '../../../domain';
+import { CategoryGroup, RatingProduct } from '../../../domain';
 import { ProductRepository } from '../../../domain/repositories/product.repository';
 import { EMPTY, pipe } from 'rxjs';
 import { tapResponse } from '@ngrx/operators'

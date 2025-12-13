@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CatalogStore } from '../../../application';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthStore, CatalogStore } from '../../../application';
 
 @Component({
   selector: 'app-header',
@@ -13,10 +13,14 @@ import { CatalogStore } from '../../../application';
 export class HeaderComponent {
   private readonly catalogStore = inject(CatalogStore);
   private readonly fb = inject(FormBuilder);
+  private readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
+
+  readonly isUserMenuOpen = signal(false);
 
   readonly categories = this.catalogStore.categories;
 
-  readonly userName = signal('Marcos Maure');
+  readonly userName = computed(() => this.authStore.profile()?.name.firstname ?? '');
   readonly userInitial = computed(() => this.userName()[0]?.toUpperCase() ?? '?');
 
   /** INPUTS */
@@ -43,7 +47,7 @@ export class HeaderComponent {
   }
 
   onSubmit() {
-    
+
     if (this.searchForm.invalid) {
       this.searchForm.markAllAsTouched();
       return;
@@ -57,4 +61,19 @@ export class HeaderComponent {
     this.searchForm.reset({ category: '', query: '' });
     this.catalogStore.clearFilters();
   }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen.update(v => !v);
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen.set(false);
+  }
+
+  onLogout(): void {
+    this.closeUserMenu();
+    this.authStore.logOut(); 
+    this.router.navigateByUrl('/login');
+  }
+
 }

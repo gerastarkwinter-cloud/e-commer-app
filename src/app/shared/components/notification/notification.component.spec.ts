@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 
 import { NotificationComponent } from './notification.component';
-import { NOTIFICATION_UI } from '../../../infrastructure/contract/notification.tokens';
+import { NOTIFICATION_UI } from '../../../infrastructure/config/notification.tokens';
 
 type NotificationType = 'success' | 'error' | 'warn' | 'info';
 type UiNotification = { type: NotificationType; message: string };

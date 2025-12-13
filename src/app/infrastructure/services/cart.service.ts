@@ -76,6 +76,7 @@ export class CartService extends CartRepository {
      */
     updateCart(cart: Cart): Observable<Cart> {
         const payload = {
+            id:cart.id,
             userId: cart.userId,
             date: new Date().toISOString(),
             products: cart.items.map(i => ({

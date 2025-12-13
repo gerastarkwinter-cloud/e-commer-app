@@ -10,7 +10,9 @@ import { CartService } from './infrastructure/services/cart.service';
 import { httpInterceptor } from './infrastructure/interceptors/app-http.interceptor';
 import { ANotificationService } from './domain';
 import { NotificationService } from './infrastructure/services/notification.service';
-import { NOTIFICATION_UI } from './infrastructure/contract/notification.tokens';
+import { NOTIFICATION_UI } from './infrastructure/config/notification.tokens';
+import { AuthRepository } from './domain/repositories/user.repository';
+import { AuthUserService } from './infrastructure';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,9 +22,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([httpInterceptor])
     ),
-    { provide: ProductRepository, useExisting: ProductService },
-    { provide: CartRepository, useExisting: CartService },
+    { provide: ProductRepository, useClass: ProductService },
+    { provide: CartRepository, useClass: CartService },
     { provide: ANotificationService, useExisting: NotificationService },
+    { provide: AuthRepository, useExisting: AuthUserService },
     { provide: NOTIFICATION_UI, useExisting: NotificationService }
   ]
 };

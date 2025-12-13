@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject } from "@angular/core";
-import { NOTIFICATION_UI } from "../../../infrastructure/contract/notification.tokens";
+import { NOTIFICATION_UI } from "../../../infrastructure/config/notification.tokens";
 
 
 @Component({
@@ -12,12 +12,7 @@ import { NOTIFICATION_UI } from "../../../infrastructure/contract/notification.t
 export class NotificationComponent {
 
     private readonly notificationService = inject(NOTIFICATION_UI)
-    readonly notifyService = this.notificationService.notification;
-    
+    readonly notifyService = this.notificationService.notification;    
     readonly position: string[] = ['left', 'rigth', 'top', 'button'];
-
-    constructor() {
-
-    }
 
 }
