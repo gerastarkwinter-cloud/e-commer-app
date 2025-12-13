@@ -24,6 +24,7 @@ class ProductListStubComponent {
 
 class CatalogStoreMock {
     products = signal<any[]>([]);
+    readonly filteredProducts = this.products;
     loadCatalogFull = jasmine.createSpy('loadCatalogFull');
 }
 

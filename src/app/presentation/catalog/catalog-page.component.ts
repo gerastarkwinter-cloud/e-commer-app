@@ -15,7 +15,7 @@ export class CatalogPageComponent implements OnInit {
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);
 
-  readonly products = this.catalogStore.products;
+  readonly products = this.catalogStore.filteredProducts;
 
   constructor() { }
 

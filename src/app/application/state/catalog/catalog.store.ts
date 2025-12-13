@@ -6,7 +6,7 @@ import {
     patchState,
     withHooks
 } from '@ngrx/signals';
-import { inject } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 
 import { CategoryGroup, Product, RatingProduct } from '../../../domain';
@@ -24,6 +24,9 @@ export interface CatalogState {
     loading: boolean;
     error: null | string;
     selectedProduct: RatingProduct | null;
+
+    filterQuery: string;
+    filterCategory: string;
 }
 
 // Iniciar estado
@@ -34,16 +37,55 @@ const initialState: CatalogState = {
     loading: false,
     error: null,
     selectedProduct: null,
+
+    filterQuery: '',
+    filterCategory: '',
 };
 
 // Definiar métodos del estado.
 export const CatalogStore = signalStore(
     withState<CatalogState>(initialState),
-    withComputed(({ products }) => ({
+    withComputed(({ products, filterCategory, filterQuery }) => ({
         totalProducts: () => products().length,
+
+        filteredProducts: computed(() => {
+            const allProducts = products();
+
+            const searchQuery = (filterQuery() ?? '').trim().toLowerCase();
+            const selectedCategory = (filterCategory() ?? '').trim().toLowerCase();
+
+            return allProducts.filter((product) => {
+                const productCategory = (product.category ?? '').toLowerCase();
+                const productTitle = (product.title ?? '').toLowerCase();
+                const productDescription = (product.description ?? '').toLowerCase();
+
+                const matchesCategory =
+                    !selectedCategory || productCategory === selectedCategory;
+
+                const matchesSearchText =
+                    !searchQuery || searchQuery.length < 2
+                        ? true
+                        : productTitle.includes(searchQuery) ||
+                        productDescription.includes(searchQuery) ||
+                        productCategory.includes(searchQuery);
+
+                return matchesCategory && matchesSearchText;
+            });
+        }),
+
     })),
     withMethods((store, repo = inject(ProductRepository)) => ({
+        setSearchQuery(query: string) {
+            patchState(store, { filterQuery: query ?? '' });
+        },
 
+        setCategoryFilter(category: string | null) {
+            patchState(store, { filterCategory: category ?? '' });
+        },
+
+        clearFilters() {
+            patchState(store, { filterQuery: '', filterCategory: '' });
+        },
         loadCatalogFull: rxMethod<void>(
             pipe(
                 tap(() => {

@@ -7,7 +7,7 @@ import { rxMethod } from "@ngrx/signals/rxjs-interop";
 import { pipe } from "rxjs";
 import { switchMap, tap } from "rxjs/operators";
 
-import { ANotificationService, Cart, CartItem } from "../../../domain";
+import { Cart, CartItem } from "../../../domain";
 import { CartRepository } from "../../../domain/repositories/cart.repository";
 
 export interface CartState {

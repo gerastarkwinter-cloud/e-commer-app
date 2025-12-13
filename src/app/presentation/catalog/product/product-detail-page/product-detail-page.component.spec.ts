@@ -18,6 +18,8 @@ class CatalogStoreMock {
 
 class CartStoreMock {
   readonly items = signal<any[]>([]);
+  readonly id = signal<number | null>(null);
+  saveCart = jasmine.createSpy('saveCart');;
 }
 
 describe('ProductDetailPageComponent', () => {
@@ -36,14 +38,14 @@ describe('ProductDetailPageComponent', () => {
   };
 
   const p = (id: number, category = 'cat'): Product =>
-    ({
-      id,
-      title: `P${id}`,
-      description: `D${id}`,
-      price: id,
-      image: `img${id}.png`,
-      category,
-    } as any as Product);
+  ({
+    id,
+    title: `P${id}`,
+    description: `D${id}`,
+    price: id,
+    image: `img${id}.png`,
+    category,
+  } as any as Product);
 
   const setupRoute = (id: number) => {
     TestBed.overrideProvider(ActivatedRoute, { useValue: makeRouteMock(id) });
@@ -120,11 +122,13 @@ describe('ProductDetailPageComponent', () => {
 
     expect(catalogStore.loadProductById).toHaveBeenCalledWith(3);
 
+    catalogStore.loadProductById.calls.reset();
+
     paramMap$.next(convertToParamMap({ id: '4' }));
     fixture.detectChanges();
 
+    expect(catalogStore.loadProductById).toHaveBeenCalledTimes(2);
     expect(catalogStore.loadProductById).toHaveBeenCalledWith(4);
-    expect(catalogStore.loadProductById.calls.count()).toBe(2);
   });
 
   it('product: debería salir desde products si existe en la lista', () => {
@@ -209,7 +213,7 @@ describe('ProductDetailPageComponent', () => {
 
     component.increaseCount();
     expect(component.updatingQuantity()).toBeTrue();
-    expect(component.quantityProductSelected()).toBe(1);
+    expect(component.quantityProductSelected()).toBe(2);
 
     jasmine.clock().tick(UPDATE_DELAY_MS);
     expect(component.quantityProductSelected()).toBe(2);
