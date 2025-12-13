@@ -4,13 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../../../domain';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';
 import { CartStore } from '../../../../application';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-product-item',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe],
+  imports: [CommonModule, ReactiveFormsModule, ShortDescriptionPipe, RouterLink],
   templateUrl: './product-item.component.html',
-  styleUrls: ['./product-item.component.scss'],
 })
 export class ProductItemComponent {
 
@@ -69,10 +69,9 @@ export class ProductItemComponent {
     }
 
     const quantity = this.amountCtrl.value;
-    const productId = this.product().id; // <- USAR el id real
+    const productId = this.product().id;
 
     this.addToCart.emit({ productId, quantity });
-    // this.inCart.set(true);
   }
 
   onUpdateAmount() {
@@ -88,11 +87,7 @@ export class ProductItemComponent {
   }
 
   onCancel(idProduct: number) {
-    console.log('idProduct: ', idProduct);
-    // return
-    // this.inCart.set(false);
     this.amountCtrl.setValue(1);
-    // Agregar el evento de eliminar
     this.deleteToCart.emit(idProduct)
   }
 }

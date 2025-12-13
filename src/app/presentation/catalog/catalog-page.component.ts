@@ -9,15 +9,13 @@ import { ProductListComponent } from './product/product-list/product-list.compon
   standalone: true,
   imports: [CommonModule, ProductListComponent],
   templateUrl: './catalog-page.component.html',
-  styleUrls: ['./catalog-page.component.scss']
 })
 export class CatalogPageComponent implements OnInit {
-
 
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);
 
-  readonly products = this.catalogStore.products;
+  readonly products = this.catalogStore.filteredProducts;
 
   constructor() { }
 
@@ -40,8 +38,6 @@ export class CatalogPageComponent implements OnInit {
       items: productsAdd || []
     }
 
-    console.log(cartItem);
-    console.log('Ver valor de cart item cuando toma su primer id: ', cartItem);
     if (cartItem.id) {
       this.cartStore.addItemToCart(cartItem);
     } else {

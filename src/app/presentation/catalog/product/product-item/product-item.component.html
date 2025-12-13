@@ -1,29 +1,36 @@
 <div class="flex flex-col h-full rounded-xl bg-slate-900 p-4 shadow">
-  <img class="mb-3 h-40 w-full rounded-lg object-cover" [src]="product().image" [alt]="product().title" />
+  <a [routerLink]="['/product', product().id]"
+    class="text-sm text-emerald-400 hover:transition-opacity hover:text-emerald-300 hover:underline underline-offset-2 transition-colors ">
+    <!-- class="text-sm text-emerald-400 hover:text-emerald-300 hover:underline underline-offset-2 transition-colors" -->
+    <!--  class="inline-flex items-center gap-1 rounded-full border border-slate-700 px-3 py-1.5 text-xs 
+         text-slate-100 hover:border-emerald-500 hover:bg-slate-800 transition-colors" -->
 
-  <h2 class="mb-1 text-sm font-semibold line-clamp-2">
-    {{ product().title }}
-  </h2>
+    <img class="mb-3 h-40 w-full rounded-lg object-cover" [src]="product().image" [alt]="product().title" />
 
-  <p class="mb-3 text-xs text-slate-300 line-clamp-2">
-    {{ product().description | shortDescriptionPipe:120}}
-  </p>
+    <h2 class="mb-1 text-sm font-semibold line-clamp-2">
+      {{ product().title }}
+    </h2>
 
-  <p class="mb-3 text-xs font-medium text-slate-300 line-clamp-2 text-emerald-400">
-    {{ product().price | currency}}
-  </p>
+    <p class="mb-3 text-xs text-slate-300 line-clamp-2">
+      {{ product().description | shortDescriptionPipe:120}}
+    </p>
+
+    <p class="mb-3 text-xs font-medium text-slate-300 line-clamp-2 text-emerald-400">
+      {{ product().price | currency}}
+    </p>
+  </a>
   <form [formGroup]="formItem" class="mt-auto flex flex-col gap-3">
 
-    @if (!inCart()) {
-    <button type="button" class="inline-flex items-center justify-center rounded-lg
+    <!-- @if (!inCart()) { -->
+    <!-- <button type="button" class="inline-flex items-center justify-center rounded-lg
                bg-emerald-600 px-3 py-1.5 text-xs font-medium
                hover:bg-emerald-500 active:scale-[0.98]
                transition-transform duration-150" (click)="onAdd()">
       Añadir al carrito
-    </button>
-    }
+    </button> -->
+    <!-- } -->
 
-    @if (inCart()) {
+    @if (true) {
     <div class="flex flex-1 items-center justify-between gap-3">
       <div class="flex items-center gap-2">
         <button type="button" class="flex h-8 w-8 items-center justify-center rounded-lg
@@ -49,8 +56,11 @@
         <button type="button" class="inline-flex items-center justify-center rounded-lg
                    bg-emerald-600 px-3 py-1.5 text-sm font-medium gap-2
                    hover:bg-emerald-500 active:scale-[0.98]
-                   transition-transform duration-150" (click)="onUpdateAmount()">
-          Actualizar
+                   transition-transform duration-150" (click)="onAdd()">
+          <span class="material-symbols-outlined text-base">
+            shopping_cart
+          </span>
+          Añadir
         </button>
       </div>
     </div>

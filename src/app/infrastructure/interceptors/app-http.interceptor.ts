@@ -33,8 +33,8 @@ export const httpInterceptor: HttpInterceptorFn = (req, next) => {
 
     const cloned = req.clone({
         setHeaders: {
-            'X-App-Client': req.headers.get('X-App-Client') ?? 'ecommerce-app',
-            'token': 'asdads66666sa-sfsdfdsfsbdDSDDDGGGGSFsvd96'
+            // 'X-App-Client': req.headers.get('X-App-Client') ?? 'ecommerce-app',
+            // 'token': 'asdads66666sa-sfsdfdsfsbdDSDDDGGGGSFsvd96'
         },
     });
 

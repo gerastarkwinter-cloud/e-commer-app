@@ -4,7 +4,7 @@ import { TestBed } from "@angular/core/testing";
 import { provideZonelessChangeDetection } from "@angular/core";
 import { CartRepository } from "../../../domain/repositories/cart.repository";
 import { throwError } from "rxjs";
-import { Cart } from "../../../domain";
+import { ANotificationService, Cart } from "../../../domain";
 import { patchState } from "@ngrx/signals";
 
 
@@ -24,6 +24,7 @@ describe('CartStore', () => {
         repo = TestBed.inject(CartRepository) as CartRepositoryMock;
     });
 
+    it
     it('debería cargar el carrito por usuario y actualizar el estado', () => {
 
         expect(store.loading()).toBeFalse();
@@ -56,12 +57,7 @@ describe('CartStore', () => {
         expect(store.items().length).toBe(0);
     });
 
-    it('debería agregar un item al carrito y actualizar cantidades.', () => {
-        patchState(store as any, {
-            userId: 1,
-            items: [{ productId: 1, quantity: 2 }],
-        });
-
+    it('debería agregar un item al carrito.', () => {
         const payload: Cart = {
             id: 1,
             userId: 1,
@@ -70,17 +66,16 @@ describe('CartStore', () => {
 
         store.addItemToCart(payload);
 
-        expect(repo.createCart).toHaveBeenCalledWith(payload);
         expect(store.userId()).toBe(1);
         expect(store.items().length).toBe(1);
         expect(store.items()[0].productId).toBe(1);
-        expect(store.items()[0].quantity).toBe(4);
+        expect(store.items()[0].quantity).toBe(2);
     });
 
-    it('debería actualizar un producto del carrito y su cantidad dado un id', () => {
+    it('debería actualizar la cantidad del producto dado su id', () => {
         patchState(store as any, {
             userId: 1,
-            items: [{ productId: 1, quantity: 2 }],
+            items: [{ productId: 1, quantity: 6 }],
         });
 
         const payload: Cart = {
@@ -91,7 +86,6 @@ describe('CartStore', () => {
 
         store.updateItemInCart(payload);
 
-        expect(repo.updateCart).toHaveBeenCalledWith(payload);
         expect(store.loading()).toBeFalse();
         expect(store.error()).toBeNull();
         expect(store.items()[0].quantity).toBe(4)
@@ -111,10 +105,73 @@ describe('CartStore', () => {
 
         store.deleteItemFromCart(2);
 
-        expect(repo.deleteCart).toHaveBeenCalledWith(2);
         expect(store.loading()).toBeFalse();
         expect(store.error()).toBeNull();
         expect(store.items().length).toBe(1)
     });
+
+    it('debería  llamar createCart y actualizar el store si el payload NO tiene id', () => {
+        patchState(store as any, { id: null, userId: 1, items: [] });
+
+        const payload: Cart = {
+            id: null as any,
+            userId: 1,
+            items: [{ productId: 1, quantity: 2 }],
+        };
+
+        store.saveCart(payload);
+
+        expect(repo.createCart).toHaveBeenCalledWith(payload);
+        expect(repo.updateCart).not.toHaveBeenCalled();
+
+        expect(store.loading()).toBeFalse();
+        expect(store.error()).toBeNull();
+
+        expect(store.id()).toBe(1);
+        expect(store.userId()).toBe(1);
+        expect(store.items()[0].quantity).toBe(2);
+    });
+
+    it('debería llamar updateCart y actualizar el store si el payload TIENE id ', () => {
+        patchState(store as any, { id: 1, userId: 1, items: [{ productId: 1, quantity: 2 }] });
+
+        const payload: Cart = {
+            id: 1,
+            userId: 1,
+            items: [{ productId: 1, quantity: 4 }],
+        };
+
+        store.saveCart(payload);
+
+        expect(repo.updateCart).toHaveBeenCalledWith(payload);
+        expect(repo.createCart).not.toHaveBeenCalled();
+
+        expect(store.loading()).toBeFalse();
+        expect(store.error()).toBeNull();
+
+        expect(store.id()).toBe(1);
+        expect(store.items()[0].quantity).toBe(4);
+
+    });
+
+    it('debería llamar al repo y resetear el store', () => {
+        patchState(store as any, {
+            id: 99,
+            userId: 1,
+            items: [{ productId: 1, quantity: 2 }],
+        });
+
+        store.deleteCart(99);
+
+        expect(repo.deleteCart).toHaveBeenCalledWith(99);
+
+        expect(store.loading()).toBeFalse();
+        expect(store.error()).toBeNull();
+
+        expect(store.id()).toBeNull();
+        expect(store.userId()).toBeNull();
+        expect(store.items()).toEqual([]);
+    });
+
 
 })
