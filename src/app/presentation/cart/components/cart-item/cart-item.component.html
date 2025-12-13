@@ -18,15 +18,21 @@
 
     <div class="mt-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <button type="button" (click)="decreaseCount()"
-          class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-lg hover:bg-slate-800">
+        <button type="button" (click)="decreaseCount()" [disabled]="updatingQuantity() || quantityProductSelected() === 1"
+          class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700
+           bg-slate-900 text-lg hover:bg-slate-800  disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none">
           −
         </button>
-        <span class="w-8 text-center text-sm font-medium">
-          {{item()?.quantity }}
+        <span class="w-10 flex justify-center text-sm">
+          @if (updatingQuantity()) {
+          <span class="h-4 w-4 rounded-full border-2 border-slate-400
+                   border-t-transparent animate-spin"></span>
+          } @else {
+          {{ item()?.quantity }}
+          }
         </span>
-        <button type="button" (click)="increaseCount()"
-          class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-lg hover:bg-slate-800">
+        <button type="button" (click)="increaseCount()" [disabled]="updatingQuantity()" class="flex h-8 w-8 items-center justify-center rounded-full border
+           border-slate-700 bg-slate-900 text-lg hover:bg-slate-800  disabled:opacity-50 disabled:cursor-not-allowed">
           +
         </button>
       </div>
