@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStore } from '../../application'; // ajusta tu path
+import { AuthStore } from '../../application';
 import { AErrorReporter, ErrorSeverity, EventError } from '../../domain/models/error-reporter';
 import { LoggerRepository } from '../../domain/repositories/logger.repository';
 
