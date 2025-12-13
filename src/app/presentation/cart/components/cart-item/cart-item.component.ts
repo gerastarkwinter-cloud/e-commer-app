@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, input, output, signal } from '@angular/core';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';
 import { CartItem } from '../../../../domain';
 import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
@@ -7,7 +7,7 @@ import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 @Component({
   selector: 'app-cart-item',
   standalone: true,
-  imports: [CommonModule, ShortDescriptionPipe],
+  imports: [CommonModule, ShortDescriptionPipe, NgOptimizedImage],
   templateUrl: './cart-item.component.html',
   styleUrls: ['./cart-item.component.scss']
 })
@@ -56,17 +56,7 @@ export class CartItemComponent {
         this.updatingQuantity.set(false);
       }, UPDATE_DELAY_MS);
     };
-    // const item = this.item();
-    // if (!item) return;
-
-    // const newQuantity = item.quantity > 1 ? item.quantity - 1 : 1;
-
-    // this.updateItemFromCart.emit({
-    //   productId: item.productId,
-    //   quantity: newQuantity,
-    // });
   }
-
 
   onDelete(idProduct: number) {
     this.deleteItemFromCart.emit(idProduct);

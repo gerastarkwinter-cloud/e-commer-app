@@ -45,12 +45,6 @@ export class CartCheckOutComponent {
     });
     readonly shippingTax = signal<number>(3.00);
 
-    constructor() {
-        console.log(this.cartStore.items());
-        console.log(this.catalogStore.products());
-        console.log(this.cartItemsVm());
-    }
-
     payout() {
         if (this.isPaying()) return;
 
