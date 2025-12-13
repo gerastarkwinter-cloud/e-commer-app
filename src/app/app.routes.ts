@@ -1,22 +1,59 @@
 import { Routes } from '@angular/router';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { publicGuard } from './infrastructure/guards/public.guard';
+import { authGuard } from './infrastructure/guards/auth.guard';
 
 export const appRoutes: Routes = [
-    { path: '', pathMatch: 'full', redirectTo: 'catalog' },
-    {
-        path: 'catalog', /* component: CatalogPageComponent, */
-        loadComponent: () => import('./presentation/catalog/catalog-page.component').then(m => m.CatalogPageComponent)
-    },
-    {
-        path: 'cart', /* component: CartPageComponent */
-        loadComponent: () => import('./presentation/cart/cart-page.component').then(m => m.CartPageComponent)
-    },
-    {
+  { path: '', pathMatch: 'full', redirectTo: 'catalog' },
+
+  // Público
+  {
+    path: 'login',
+    canActivate: [publicGuard],
+    loadComponent: () =>
+      import('./presentation/auth/login-page/login-page.component')
+        .then(m => m.LoginPageComponent),
+  },
+
+  // Shell
+  {
+    path: '',
+    loadComponent: () =>
+      import('./presentation/layout/app-shell.component')
+        .then(m => m.AppShellComponent),
+    children: [
+      // Público
+      {
+        path: 'catalog',
+        loadComponent: () =>
+          import('./presentation/catalog/catalog-page.component')
+            .then(m => m.CatalogPageComponent),
+      },
+
+      // Protegidas
+      {
         path: 'product/:id',
-        loadComponent: () => import('./presentation/catalog/product/product-detail-page/product-detail-page.component').then(m => m.ProductDetailPageComponent)
-    },
-    {
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./presentation/catalog/product/product-detail-page/product-detail-page.component')
+            .then(m => m.ProductDetailPageComponent),
+      },
+      {
+        path: 'cart',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./presentation/cart/cart-page.component')
+            .then(m => m.CartPageComponent),
+      },
+      {
         path: 'checkout',
-        loadComponent: () => import('./presentation/cart/components/cart-checkout/cart-check-out.component').then(m => m.CartCheckOutComponent)
-    },
-    { path: '**', redirectTo: 'catalog' },
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./presentation/cart/components/cart-checkout/cart-check-out.component')
+            .then(m => m.CartCheckOutComponent),
+      },
+    ],
+  },
+
+  { path: '**', component: NotFoundComponent },
 ];

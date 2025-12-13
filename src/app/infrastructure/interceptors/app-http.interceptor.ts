@@ -8,12 +8,16 @@ import { throwError } from 'rxjs';
 
 import { AppError } from '../../domain/models/app-error.model';
 import { ANotificationService } from '../../domain';
+import { AuthStore } from '../../application';
 
 const mapHttpError = (err: HttpErrorResponse): AppError => {
     let message = 'Ha ocurrido un error inesperado. Inténtalo más tarde.';
 
     if (err.status === 0) {
         message = 'No hay conexión con el servidor. Revisa tu red.';
+
+    } else if (err.status === 401) {
+        message = 'Usuario o contraseña incorrecta.';
     } else if (err.status >= 400 && err.status < 500) {
         message = 'Hubo un problema con la petición. Revisa los datos enviados.';
     } else if (err.status >= 500) {
@@ -30,11 +34,12 @@ const mapHttpError = (err: HttpErrorResponse): AppError => {
 
 export const httpInterceptor: HttpInterceptorFn = (req, next) => {
     const notification = inject(ANotificationService);
+    const autUser = inject(AuthStore);
 
     const cloned = req.clone({
         setHeaders: {
-            // 'X-App-Client': req.headers.get('X-App-Client') ?? 'ecommerce-app',
-            // 'token': 'asdads66666sa-sfsdfdsfsbdDSDDDGGGGSFsvd96'
+            'X-App-Client': req.headers.get('X-App-Client') ?? 'ecommerce-app',
+            'token': autUser.token() ?? ''
         },
     });
 
