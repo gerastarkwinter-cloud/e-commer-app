@@ -212,7 +212,6 @@ describe('ProductDetailPageComponent', () => {
     expect(component.quantityProductSelected()).toBe(1);
 
     jasmine.clock().tick(UPDATE_DELAY_MS);
-
     expect(component.quantityProductSelected()).toBe(2);
     expect(component.updatingQuantity()).toBeFalse();
   });
