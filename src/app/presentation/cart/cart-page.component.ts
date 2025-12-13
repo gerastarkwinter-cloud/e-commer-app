@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CartStore, CatalogStore } from '../../application';
+import { AuthStore, CartStore, CatalogStore } from '../../application';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
 import { Cart, CartItem, Product } from '../../domain';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-cart-page',
@@ -16,6 +17,11 @@ export class CartPageComponent {
 
   private readonly cartStore = inject(CartStore);
   private readonly catalogStore = inject(CatalogStore);
+  private readonly authStore = inject(AuthStore);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  private readonly userId = this.authStore.id;
 
   readonly cartItemsVm = computed(() => {
     const items = this.cartStore.items();
@@ -47,7 +53,7 @@ export class CartPageComponent {
     effect(() => {
       const items = this.items();
       const cartId = this.cartId();
-      if (!items.length  && cartId !== null ) {
+      if (!items.length && cartId !== null) {
         this.cancelOrder();
       }
     });
@@ -58,11 +64,13 @@ export class CartPageComponent {
    */
   saveCart() {
     const cartSave: Cart = {
-      id: null,
+      id: this.cartId(),
       userId: 1,
       items: this.items()
     }
     this.cartStore.saveCart(cartSave);
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    this.router.navigateByUrl(returnUrl ?? '/checkout');
   }
 
   cancelOrder() {
@@ -77,9 +85,9 @@ export class CartPageComponent {
       productId: event.productId,
       quantity: event.quantity
     }]
-    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const userId = this.userId() as number;
     const cartItem: Cart = {
-      id: this.cartId(), 
+      id: this.cartId(),
       userId: userId,
       items: productsAdd || []
     }

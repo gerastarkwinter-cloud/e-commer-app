@@ -43,7 +43,14 @@
       <button type="submit" class="w-full inline-flex items-center justify-center rounded-full
                bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
                hover:bg-emerald-400 active:scale-[0.98] transition" [disabled]="isLoading()">
+        @if (isLoading()) {
+        <span class="inline-flex items-center gap-2">
+          <span class="h-4 w-4 rounded-full border-2 border-slate-950/70 border-t-transparent animate-spin"></span>
+          Entrando...
+        </span>
+        } @else {
         Login
+        }
       </button>
 
       <!-- Bloque inferior de errores generales (para “cuando le doy al login”) -->

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { CartStore, CatalogStore } from '../../application';
+import { AuthStore, CartStore, CatalogStore } from '../../application';
 import { Cart } from '../../domain';
 import { ProductListComponent } from './product/product-list/product-list.component';
 
@@ -14,6 +14,10 @@ export class CatalogPageComponent implements OnInit {
 
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);
+  private readonly authStore = inject(AuthStore);
+
+  private readonly cartId = this.cartStore.id;
+  private readonly userId = this.authStore.id;
 
   readonly products = this.catalogStore.filteredProducts;
 
@@ -27,7 +31,7 @@ export class CatalogPageComponent implements OnInit {
     let productId: number = event.productId;
     let quantity: number = event.quantity;
 
-    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const userId = this.userId() as number;
     const productsAdd = [{
       productId,
       quantity
@@ -48,14 +52,14 @@ export class CatalogPageComponent implements OnInit {
   UpdateItemToCart(event: any) {
     let productId: number = event.productId;
     let quantity: number = event.quantity;
-    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const userId = this.userId() as number;
     const productsAdd = [{
       productId,
       quantity
     }]
 
     const cartItem: Cart = {
-      id: 1, // TODO: Cuando se tenga el usuario se trabajara con el id del carrito selecionado, por el momento es fijo.
+      id: this.cartId() as number,
       userId: userId,
       items: productsAdd || []
     }

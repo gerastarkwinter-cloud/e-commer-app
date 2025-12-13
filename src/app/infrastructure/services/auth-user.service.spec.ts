@@ -31,10 +31,11 @@ describe('UserService', () => {
   });
 
   it('debería obtener el token', () => {
-    const payload = {
+    const payload: User = {
       id: 1,
       username: 'gera',
       password: '123456',
+      profile: {} as any
     }
     const mockAuthResponse: User[] = [
       {
@@ -42,7 +43,8 @@ describe('UserService', () => {
         username: 'gera',
         password: '123456',
         email: 'gera@gmail.com',
-        token: 'AAAbbb'
+        token: 'AAAbbb',
+        profile: {} as any
       },
     ];
 
@@ -60,7 +62,8 @@ describe('UserService', () => {
       username: 'gera',
       password: '123456',
       email: 'gera@gmail.com',
-      token: 'AAAbbb'
+      token: 'AAAbbb',
+      profile: {} as any
     });
   });
 });

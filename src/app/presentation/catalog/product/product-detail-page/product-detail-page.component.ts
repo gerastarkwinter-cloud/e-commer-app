@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { CartStore, CatalogStore } from '../../../../application';
+import { AuthStore, CartStore, CatalogStore } from '../../../../application';
 import { Cart, Product, RatingProduct } from '../../../../domain';
 import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 
@@ -17,7 +17,9 @@ export class ProductDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly catalogStore = inject(CatalogStore);
   private readonly cartStore = inject(CartStore);
+  private readonly authStore = inject(AuthStore);
 
+  private readonly userId = this.authStore.id;
   readonly products = this.catalogStore.products;
   readonly selectedProduct = this.catalogStore.selectedProduct;
   readonly isLoading = this.catalogStore.loading;
@@ -111,7 +113,7 @@ export class ProductDetailPageComponent {
 
 
   AddToCart() {
-    const userId = 1; // TODO: Cambiar luego cuando se trabaje con el userStore.
+    const userId = this.userId() as number;
     const productsAdd = [{
       productId: this.productId() as number,
       quantity: this.quantityProductSelected()

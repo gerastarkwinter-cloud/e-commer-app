@@ -90,11 +90,11 @@ export const AuthStore = signalStore(
                                 }
                             },
                             error: (error) => {
-                                console.error('Error al guardar el carrito: ', error);
+                                console.error('Error al iniciar sesion: ', error);
                                 patchState(store, {
                                     loading: false,
                                     logged: false,
-                                    error: 'Error al guardar el carrito',
+                                    error: 'Error al iniciar sesion',
                                 });
                             }
                         })
