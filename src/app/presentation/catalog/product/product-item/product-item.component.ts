@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, output, effect, inject, ChangeDetectionStrategy, computed } from '@angular/core';
+import { Component, input, output, effect, inject, ChangeDetectionStrategy, computed, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../../../domain';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';
@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 export class ProductItemComponent {
 
   private readonly cartStore = inject(CartStore);
+  private readonly fb = inject(FormBuilder);
 
   /** INPUTS */
   readonly product = input.required<Product>();
@@ -24,9 +25,6 @@ export class ProductItemComponent {
   readonly addToCart = output<{ productId: number, quantity: number }>();
   readonly updateToCart = output<{ productId: number, quantity: number }>();
   readonly deleteToCart = output<number>();
-
-  // readonly inCart = signal(false);
-  private readonly fb = inject(FormBuilder);
 
   readonly formItem = this.fb.nonNullable.group({
     amount: [1, [Validators.required, Validators.min(1)]],

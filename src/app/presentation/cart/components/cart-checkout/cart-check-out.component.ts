@@ -1,15 +1,16 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, signal } from "@angular/core";
+import { Component, computed, inject, signal } from "@angular/core";
 import { CartStore, CatalogStore } from "../../../../application";
-import { ANotificationService } from "../../../../domain";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ANotificationService, CartItem, Product } from "../../../../domain";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { UPDATE_DELAY_MS } from "../../../../shared/utils/const.utils";
+import { CartItemComponent } from "../cart-item/cart-item.component";
 
 @Component({
     selector: 'app-cart-checkout',
     templateUrl: './cart-check-out.component.html',
     standalone: true,
-    imports: [CommonModule]
+    imports: [CommonModule, RouterLink, CartItemComponent]
 })
 export class CartCheckOutComponent {
     private readonly cartStore = inject(CartStore);
@@ -22,6 +23,27 @@ export class CartCheckOutComponent {
     readonly cartId = this.cartStore.id;
 
     readonly isPaying = signal(false);
+
+    readonly cartItemsVm = computed(() => {
+        const items = this.cartStore.items();
+        const products = this.catalogStore.products();
+
+        const productById = new Map<number, Product>(
+            products.map(p => [p.id, p])
+        );
+
+        return items.map(item => ({
+            ...item,
+            product: productById.get(item.productId) ?? undefined,
+        }) satisfies CartItem);
+    });
+
+    readonly subtotal = computed(() => {
+        return this.cartItemsVm().reduce((total, item) =>
+            total + (item.product?.price ?? 0) * item.quantity,
+            0)
+    });
+    readonly shippingTax = signal<number>(3.00);
 
     payout() {
         if (this.isPaying()) return;

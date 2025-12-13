@@ -1,9 +1,6 @@
 <div class="flex flex-col h-full rounded-xl bg-slate-900 p-4 shadow">
   <a [routerLink]="['/product', product().id]"
     class="text-sm text-emerald-400 hover:transition-opacity hover:text-emerald-300 hover:underline underline-offset-2 transition-colors ">
-    <!-- class="text-sm text-emerald-400 hover:text-emerald-300 hover:underline underline-offset-2 transition-colors" -->
-    <!--  class="inline-flex items-center gap-1 rounded-full border border-slate-700 px-3 py-1.5 text-xs 
-         text-slate-100 hover:border-emerald-500 hover:bg-slate-800 transition-colors" -->
 
     <img class="mb-3 h-40 w-full rounded-lg object-cover" [src]="product().image" [alt]="product().title" />
 
@@ -20,15 +17,6 @@
     </p>
   </a>
   <form [formGroup]="formItem" class="mt-auto flex flex-col gap-3">
-
-    <!-- @if (!inCart()) { -->
-    <!-- <button type="button" class="inline-flex items-center justify-center rounded-lg
-               bg-emerald-600 px-3 py-1.5 text-xs font-medium
-               hover:bg-emerald-500 active:scale-[0.98]
-               transition-transform duration-150" (click)="onAdd()">
-      Añadir al carrito
-    </button> -->
-    <!-- } -->
 
     @if (true) {
     <div class="flex flex-1 items-center justify-between gap-3">

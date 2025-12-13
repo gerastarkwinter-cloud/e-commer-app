@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, } from '@angular/core';
 import { AuthStore, CartStore, CatalogStore } from '../../application';
 import { Cart } from '../../domain';
 import { ProductListComponent } from './product/product-list/product-list.component';
@@ -20,6 +20,7 @@ export class CatalogPageComponent implements OnInit {
   private readonly userId = this.authStore.id;
 
   readonly products = this.catalogStore.filteredProducts;
+  readonly isPaying = this.catalogStore.loading;
 
   constructor() { }
 
