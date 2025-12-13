@@ -132,35 +132,27 @@
                 <p class="text-xs uppercase tracking-wide text-slate-400">Resumen</p>
 
                 <div class="space-y-3">
-                    <div class="flex gap-3 rounded-xl border border-slate-800 bg-slate-950 p-3">
-                        <img class="h-16 w-16 rounded-lg object-cover" src="https://via.placeholder.com/128"
-                            alt="Producto" />
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-medium line-clamp-1">Producto ejemplo</p>
-                            <p class="text-xs text-slate-400">Cantidad: 2</p>
-                        </div>
-                        <p class="text-sm font-semibold text-emerald-400">$22.30</p>
-                    </div>
-
-                    <div class="flex gap-3 rounded-xl border border-slate-800 bg-slate-950 p-3">
-                        <img class="h-16 w-16 rounded-lg object-cover" src="https://via.placeholder.com/128"
-                            alt="Producto" />
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-medium line-clamp-1">Otro producto</p>
-                            <p class="text-xs text-slate-400">Cantidad: 1</p>
-                        </div>
-                        <p class="text-sm font-semibold text-emerald-400">$10.00</p>
+                    <div class="p-5 space-y-4">
+                        @if (cartItemsVm()!.length) {
+                        @for (product of cartItemsVm(); track product.productId) {
+                        <app-cart-item [item]="product" [showControlsAmmoun]="false" />
+                        }
+                        } @else {
+                        <p class="text-sm text-slate-300">
+                            El carrito está vacío.
+                        </p>
+                        }
                     </div>
                 </div>
 
                 <div class="border-t border-slate-800 pt-4 space-y-2 text-sm">
                     <div class="flex justify-between text-slate-300">
                         <span>Subtotal</span>
-                        <span>$54.60</span>
+                        <span>{{ subtotal() | currency}}</span>
                     </div>
                     <div class="flex justify-between text-slate-300">
                         <span>Envío</span>
-                        <span>$3.00</span>
+                        <span>{{ shippingTax() | currency }}</span>
                     </div>
                     <div class="flex justify-between text-slate-300">
                         <span>Descuento</span>
@@ -168,7 +160,7 @@
                     </div>
                     <div class="flex justify-between text-slate-100 font-semibold pt-2 border-t border-slate-800">
                         <span>Total</span>
-                        <span class="text-emerald-400">$57.60</span>
+                        <span class="text-emerald-400">{{( subtotal() + shippingTax()) | currency}}</span>
                     </div>
                 </div>
 

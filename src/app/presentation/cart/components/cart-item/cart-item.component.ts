@@ -13,14 +13,12 @@ import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 })
 export class CartItemComponent {
 
-  // incrementSingal = signal<number>(0);
-  // decrementSignal = signal<number>(0);
-
   readonly updatingQuantity = signal(false);
   readonly quantityProductSelected = signal(0);
 
   //** INPUTS */
   item = input<CartItem>();
+  showControlsAmmoun = input<boolean>(true);
 
   /** OUTPUTS */
   readonly deleteItemFromCart = output<number>();
