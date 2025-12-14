@@ -1,17 +1,22 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { provideRouter } from '@angular/router';
 
 import { ProductItemComponent } from './product-item.component';
-import { CartStore } from '../../../../application';
+import { AuthStore, CartStore } from '../../../../application';
 import { Product } from '../../../../domain';
-import { provideRouter } from '@angular/router';
 
 class CartStoreMock {
     readonly items = signal<any[]>([]);
 }
 
+class AuthStoreMock {
+    readonly logged = signal<boolean>(true);
+}
+
 describe('ProductItemComponent', () => {
     let cartStore: CartStoreMock;
+    let authStore: AuthStoreMock;
 
     const productMock = {
         id: 1,
@@ -23,6 +28,7 @@ describe('ProductItemComponent', () => {
 
     beforeEach(() => {
         cartStore = new CartStoreMock();
+        authStore = new AuthStoreMock();
 
         TestBed.configureTestingModule({
             imports: [ProductItemComponent],
@@ -30,6 +36,7 @@ describe('ProductItemComponent', () => {
                 provideZonelessChangeDetection(),
                 provideRouter([]),
                 { provide: CartStore, useValue: cartStore },
+                { provide: AuthStore, useValue: authStore },
             ],
         });
     });
@@ -46,6 +53,7 @@ describe('ProductItemComponent', () => {
         expect(component.product().id).toBe(1);
         expect(component.inCart()).toBeFalse();
         expect(component.formItem.controls.amount.value).toBe(1);
+        expect(component.isLogged()).toBeTrue();
     });
 
     it('inCart: debería ser true si el producto existe en el carrito', () => {
@@ -96,6 +104,21 @@ describe('ProductItemComponent', () => {
         expect(component.formItem.controls.amount.value).toBe(1);
     });
 
+    it('onAdd: si el form es inválido no emite', () => {
+        const fixture = TestBed.createComponent(ProductItemComponent);
+        const component = fixture.componentInstance;
+
+        fixture.componentRef.setInput('product', productMock);
+        fixture.detectChanges();
+
+        spyOn(component.addToCart, 'emit');
+
+        component.formItem.controls.amount.setValue(0);
+        component.onAdd();
+
+        expect(component.addToCart.emit).not.toHaveBeenCalled();
+    });
+
     it('onAdd: debería emitir addToCart con productId y quantity', () => {
         const fixture = TestBed.createComponent(ProductItemComponent);
         const component = fixture.componentInstance;
@@ -109,6 +132,21 @@ describe('ProductItemComponent', () => {
         component.onAdd();
 
         expect(component.addToCart.emit).toHaveBeenCalledWith({ productId: 1, quantity: 4 });
+    });
+
+    it('onUpdateAmount: si el form es inválido no emite', () => {
+        const fixture = TestBed.createComponent(ProductItemComponent);
+        const component = fixture.componentInstance;
+
+        fixture.componentRef.setInput('product', productMock);
+        fixture.detectChanges();
+
+        spyOn(component.updateToCart, 'emit');
+
+        component.formItem.controls.amount.setValue(0);
+        component.onUpdateAmount();
+
+        expect(component.updateToCart.emit).not.toHaveBeenCalled();
     });
 
     it('onUpdateAmount: debería emitir updateToCart con productId y quantity', () => {

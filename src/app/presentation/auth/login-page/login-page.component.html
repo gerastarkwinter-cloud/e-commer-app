@@ -1,13 +1,19 @@
 <div class="min-h-screen bg-slate-950 text-slate-50 flex items-center justify-center px-4">
   <div class="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow">
-    <div class="mb-6">
+    <a routerLink="/catalog" class="flex items-center justify-center gap-2 text-lg font-semibold tracking-tight shrink-0 relative -top-10  right-0">
+      <span
+        class="inline-flex text-6xl h-20 w-20 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 font-bold">
+        G
+      </span>
+    </a>
+    <div class="mb-6 flex flex-col justify-center items-center">
       <h1 class="text-xl font-semibold">Iniciar sesión</h1>
       <p class="text-xs text-slate-400 mt-1">
         Accede con tu usuario y contraseña.
       </p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4 ">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
         <label class="block text-xs text-slate-300 mb-1">Username</label>
         <input type="text" formControlName="username" autocomplete="username" class="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm
@@ -40,18 +46,27 @@
         }
       </div>
 
-      <button type="submit" class="w-full inline-flex items-center justify-center rounded-full
+      <div class="flex flex-row gap-3">
+        <button type="submit" class="w-full inline-flex items-center justify-center rounded-full
                bg-emerald-500 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
                hover:bg-emerald-400 active:scale-[0.98] transition" [disabled]="isLoading()">
-        @if (isLoading()) {
-        <span class="inline-flex items-center gap-2">
-          <span class="h-4 w-4 rounded-full border-2 border-slate-950/70 border-t-transparent animate-spin"></span>
-          Entrando...
-        </span>
-        } @else {
-        Login
-        }
-      </button>
+          @if (isLoading()) {
+          <span class="inline-flex items-center gap-2">
+            <span class="h-4 w-4 rounded-full border-2 border-slate-950/70 border-t-transparent animate-spin"></span>
+            Entrando...
+          </span>
+          } @else {
+          Login
+          }
+        </button>
+
+        <button type="submit" class="w-full inline-flex items-center justify-center rounded-full
+               bg-orange-400 px-4 py-2 text-sm font-medium text-slate-950 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
+               hover:bg-transparent hover:text-gray-200 hover:border-solid border-s-orange-300 active:scale-[0.98] transition">
+          Registrarse
+        </button>
+      </div>
+
 
       <!-- Bloque inferior de errores generales (para “cuando le doy al login”) -->
       @if (isSubmitted() && loginForm.invalid) {

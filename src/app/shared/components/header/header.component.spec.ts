@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { HeaderComponent } from './header.component';
 import { AuthStore, CatalogStore } from '../../../application';
@@ -14,7 +14,7 @@ class CatalogStoreMock {
 }
 
 class AuthStoreMock {
-  // HeaderComponent lee profile() como Signal.
+  readonly logged = signal<boolean>(true);
   readonly profile = signal<any>({ name: { firstname: 'Marcos' } });
   logOut = jasmine.createSpy('logOut');
 }
@@ -82,9 +82,9 @@ describe('HeaderComponent', () => {
     catalogStore.setSearchQuery.calls.reset();
 
     component.searchForm.controls.query.setValue('a');
-    fixture.detectChanges();
 
-    expect(catalogStore.setSearchQuery).toHaveBeenCalledWith('');
+    expect(catalogStore.setSearchQuery).toHaveBeenCalled();
+    expect(catalogStore.setSearchQuery.calls.mostRecent().args[0]).toBe('');
   });
 
   it('query: debería filtrar cuando el control es válido', () => {
@@ -96,14 +96,13 @@ describe('HeaderComponent', () => {
 
     component.searchForm.controls.query.setValue('a');
     const requiredLength =
-      component.searchForm.controls.query.errors?.['minlength']?.requiredLength ?? 2;
+      component.searchForm.controls.query.errors?.['minlength']?.requiredLength ?? 4;
 
     const validQuery = 'x'.repeat(requiredLength);
 
     catalogStore.setSearchQuery.calls.reset();
 
     component.searchForm.controls.query.setValue(validQuery);
-    fixture.detectChanges();
 
     expect(catalogStore.setSearchQuery).toHaveBeenCalledWith(validQuery);
   });
@@ -118,12 +117,10 @@ describe('HeaderComponent', () => {
     catalogStore.setCategoryFilter.calls.reset();
 
     component.searchForm.controls.category.setValue('electronics');
-    fixture.detectChanges();
 
     expect(catalogStore.setCategoryFilter).toHaveBeenCalledWith('electronics');
 
     component.searchForm.controls.category.setValue('');
-    fixture.detectChanges();
 
     expect(catalogStore.setCategoryFilter).toHaveBeenCalledWith(null);
   });
@@ -138,7 +135,6 @@ describe('HeaderComponent', () => {
     catalogStore.setSearchQuery.calls.reset();
 
     component.searchForm.controls.query.setValue('', { emitEvent: false });
-
     component.onSubmit();
 
     expect(catalogStore.setSearchQuery).not.toHaveBeenCalled();
@@ -153,7 +149,7 @@ describe('HeaderComponent', () => {
 
     component.searchForm.controls.query.setValue('a');
     const requiredLength =
-      component.searchForm.controls.query.errors?.['minlength']?.requiredLength ?? 2;
+      component.searchForm.controls.query.errors?.['minlength']?.requiredLength ?? 4;
 
     const validQuery = 'z'.repeat(requiredLength);
 
@@ -178,7 +174,6 @@ describe('HeaderComponent', () => {
     catalogStore.clearFilters.calls.reset();
 
     component.onClear();
-    fixture.detectChanges();
 
     expect(catalogStore.clearFilters).toHaveBeenCalled();
     expect(component.searchForm.controls.category.value).toBe('');
@@ -193,7 +188,6 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     authStore.profile.set({ name: { firstname: 'ana' } });
-    fixture.detectChanges();
 
     expect(component.userInitial()).toBe('A');
   });
@@ -206,8 +200,26 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     authStore.profile.set(null);
-    fixture.detectChanges();
 
     expect(component.userInitial()).toBe('?');
+  });
+
+  it('onLogout: debería cerrar menú, hacer logout y navegar a /login', () => {
+    const fixture = TestBed.createComponent(HeaderComponent);
+    const component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('title', 'MiHogar');
+    fixture.detectChanges();
+
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.returnValue(Promise.resolve(true) as any);
+
+    component.isUserMenuOpen.set(true);
+
+    component.onLogout();
+
+    expect(component.isUserMenuOpen()).toBeFalse();
+    expect(authStore.logOut).toHaveBeenCalled();
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
   });
 });
