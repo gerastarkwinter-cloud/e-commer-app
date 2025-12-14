@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { timer } from 'rxjs';
-import { AErrorReporter, EventError } from '../../domain/models/error-reporter';
+import { AErrorReporter, EventError } from '../../../domain/models/error-reporter';
 
 @Injectable({ providedIn: 'root' })
 export class MockRemoteErrorReporter implements AErrorReporter {

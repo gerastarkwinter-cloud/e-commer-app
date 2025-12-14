@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { AuthRepository } from '../../domain/repositories/user.repository';
+import { AuthRepository } from '../../../domain/repositories/user.repository';
 import { concatMap, from, map, Observable, switchMap } from 'rxjs';
-import { Profile, User } from '../../domain';
+import { Profile, User } from '../../../domain';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({

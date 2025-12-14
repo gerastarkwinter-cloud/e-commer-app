@@ -1,16 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, ParamMap, convertToParamMap, provideRouter } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
 import { ProductDetailPageComponent } from './product-detail-page.component';
-import { CartStore, CatalogStore } from '../../../../application';
+import { AuthStore, CartStore, CatalogStore } from '../../../../application';
 import { Product } from '../../../../domain';
 import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
+
+class AuthStoreMock {
+  readonly id = signal<number | null>(123);
+}
 
 class CatalogStoreMock {
   readonly products = signal<Product[]>([]);
   readonly selectedProduct = signal<any>(null);
+  readonly loading = signal(false);
 
   loadCatalogFull = jasmine.createSpy('loadCatalogFull');
   loadProductById = jasmine.createSpy('loadProductById');
@@ -19,22 +24,26 @@ class CatalogStoreMock {
 class CartStoreMock {
   readonly items = signal<any[]>([]);
   readonly id = signal<number | null>(null);
-  saveCart = jasmine.createSpy('saveCart');;
+
+  saveCart = jasmine.createSpy('saveCart');
+  addItemToCart = jasmine.createSpy('addItemToCart');
 }
 
 describe('ProductDetailPageComponent', () => {
+  let authStore: AuthStoreMock;
   let catalogStore: CatalogStoreMock;
   let cartStore: CartStoreMock;
 
-  let paramMap$: BehaviorSubject<any>;
+  let paramMap$: BehaviorSubject<ParamMap>;
 
   const makeRouteMock = (id: number | null) => {
-    paramMap$ = new BehaviorSubject(convertToParamMap(id == null ? {} : { id: String(id) }));
+    const map = convertToParamMap(id == null ? {} : { id: String(id) });
+    paramMap$ = new BehaviorSubject<ParamMap>(map);
 
     return {
-      snapshot: { paramMap: convertToParamMap(id == null ? {} : { id: String(id) }) },
+      snapshot: { paramMap: map },
       paramMap: paramMap$.asObservable(),
-    } as any as ActivatedRoute;
+    } as unknown as ActivatedRoute;
   };
 
   const p = (id: number, category = 'cat'): Product =>
@@ -55,11 +64,15 @@ describe('ProductDetailPageComponent', () => {
   beforeEach(() => {
     jasmine.clock().install();
 
+    authStore = new AuthStoreMock();
     catalogStore = new CatalogStoreMock();
     cartStore = new CartStoreMock();
 
     // defaults seguros
+    catalogStore.products.set([]);
     catalogStore.selectedProduct.set(p(1));
+    cartStore.items.set([]);
+    cartStore.id.set(null);
 
     TestBed.configureTestingModule({
       imports: [ProductDetailPageComponent],
@@ -67,6 +80,7 @@ describe('ProductDetailPageComponent', () => {
         provideZonelessChangeDetection(),
         provideRouter([]),
 
+        { provide: AuthStore, useValue: authStore },
         { provide: CatalogStore, useValue: catalogStore },
         { provide: CartStore, useValue: cartStore },
         { provide: ActivatedRoute, useValue: makeRouteMock(1) },
@@ -180,8 +194,8 @@ describe('ProductDetailPageComponent', () => {
 
     const related = component.relatedProducts();
     expect(related.length).toBe(6);
-    expect(related.some(x => x.id === 1)).toBeFalse();
-    expect(related.every(x => x.category === 'A')).toBeTrue();
+    expect(related.some((x) => x.id === 1)).toBeFalse();
+    expect(related.every((x) => x.category === 'A')).toBeTrue();
   });
 
   it('effect: debería sincronizar quantityProductSelected con el carrito', () => {
@@ -236,6 +250,7 @@ describe('ProductDetailPageComponent', () => {
     jasmine.clock().tick(UPDATE_DELAY_MS);
 
     expect(component.quantityProductSelected()).toBe(2);
+    expect(component.updatingQuantity()).toBeFalse();
   });
 
   it('decreaseCount: no debería bajar de 1', () => {

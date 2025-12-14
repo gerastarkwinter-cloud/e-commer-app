@@ -6,7 +6,7 @@ import { provideHttpClient } from '@angular/common/http';
 
 
 import { ProductService } from "./product.service";
-import { CatalogDetails, Product } from '../../domain';
+import { CatalogDetails, Product } from '../../../domain';
 
 describe('ProductService', () => {
     let service: ProductService;

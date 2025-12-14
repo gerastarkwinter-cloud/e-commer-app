@@ -4,8 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { concatMap, from, Observable, of, switchMap, toArray } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ProductRepository } from '../../domain/repositories/product.repository';
-import { CatalogDetails, Product } from '../../domain'
+import { ProductRepository } from '../../../domain/repositories/product.repository';
+import { CatalogDetails, Product } from '../../../domain'
 
 @Injectable({ providedIn: 'root' })
 export class ProductService extends ProductRepository {

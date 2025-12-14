@@ -1,117 +1,118 @@
 import { TestBed } from '@angular/core/testing';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  provideZonelessChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideZonelessChangeDetection } from '@angular/core';
 
 import { ProductListComponent } from './product-list.component';
 import { ProductItemComponent } from '../product-item/product-item.component';
 import { Product } from '../../../../domain';
 
 @Component({
-    selector: 'app-product-item',
-    standalone: true,
-    template: '',
+  selector: 'app-product-item',
+  standalone: true,
+  template: '',
 })
 class ProductItemStubComponent {
-    @Input() product: any;
-    @Input() isHaveItems: any;
+  @Input() product: Product | null = null;
+  @Input() isHaveItems: boolean | null = null;
 
-    @Output() addToCart = new EventEmitter<any>();
-    @Output() updateToCart = new EventEmitter<any>();
-    @Output() deleteToCart = new EventEmitter<any>();
+  @Output() addToCart = new EventEmitter<any>();
+  @Output() updateToCart = new EventEmitter<any>();
+  @Output() deleteToCart = new EventEmitter<any>();
 }
 
 describe('ProductListComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProductListComponent, ProductItemStubComponent],
+      providers: [provideZonelessChangeDetection(), provideRouter([])],
+    })
+      .overrideComponent(ProductListComponent, {
+        remove: { imports: [ProductItemComponent] },
+        add: { imports: [ProductItemStubComponent] },
+      })
+      .compileComponents();
+  });
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({
-            imports: [ProductListComponent, ProductItemStubComponent],
-            providers: [
-                provideZonelessChangeDetection(),
-                provideRouter([]),
-            ],
-        });
+  it('debería crear el componente', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
+    const component = fixture.componentInstance;
 
-        TestBed.overrideComponent(ProductListComponent, {
-            remove: { imports: [ProductItemComponent] },
-            add: { imports: [ProductItemStubComponent] },
-        });
-    });
+    fixture.componentRef.setInput('items', [] as Product[]);
+    fixture.detectChanges();
 
-    it('debería crear el componente', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
-        const component = fixture.componentInstance;
+    expect(component).toBeTruthy();
+  });
 
-        fixture.componentRef.setInput('items', [] as Product[]);
-        fixture.detectChanges();
+  it('debería emitir emitToCreate cuando se llama onAddTo', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
+    const component = fixture.componentInstance;
 
-        expect(component).toBeTruthy();
-    });
+    fixture.componentRef.setInput('items', [] as Product[]);
+    fixture.detectChanges();
 
-    it('debería emitir emitToCreate cuando se llama onAddTo', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
-        const component = fixture.componentInstance;
+    spyOn(component.emitToCreate, 'emit');
 
-        fixture.componentRef.setInput('items', [] as Product[]);
-        fixture.detectChanges();
+    component.onAddTo({ productId: 1, quantity: 2 });
 
-        spyOn(component.emitToCreate, 'emit');
+    expect(component.emitToCreate.emit).toHaveBeenCalledWith({ productId: 1, quantity: 2 });
+  });
 
-        component.onAddTo({ productId: 1, quantity: 2 });
+  it('debería emitir emitToUpdate cuando se llama onUpdateTo', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
+    const component = fixture.componentInstance;
 
-        expect(component.emitToCreate.emit).toHaveBeenCalledWith({ productId: 1, quantity: 2 });
-    });
+    fixture.componentRef.setInput('items', [] as Product[]);
+    fixture.detectChanges();
 
-    it('debería emitir emitToUpdate cuando se llama onUpdateTo', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
-        const component = fixture.componentInstance;
+    spyOn(component.emitToUpdate, 'emit');
 
-        fixture.componentRef.setInput('items', [] as Product[]);
-        fixture.detectChanges();
+    component.onUpdateTo({ productId: 1, quantity: 5 });
 
-        spyOn(component.emitToUpdate, 'emit');
+    expect(component.emitToUpdate.emit).toHaveBeenCalledWith({ productId: 1, quantity: 5 });
+  });
 
-        component.onUpdateTo({ productId: 1, quantity: 5 });
+  it('debería emitir emitToDelete cuando se llama onDeleteTo', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
+    const component = fixture.componentInstance;
 
-        expect(component.emitToUpdate.emit).toHaveBeenCalledWith({ productId: 1, quantity: 5 });
-    });
+    fixture.componentRef.setInput('items', [] as Product[]);
+    fixture.detectChanges();
 
-    it('debería emitir emitToDelete cuando se llama onDeleteTo', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
-        const component = fixture.componentInstance;
+    spyOn(component.emitToDelete, 'emit');
 
-        fixture.componentRef.setInput('items', [] as Product[]);
-        fixture.detectChanges();
+    component.onDeleteTo(9);
 
-        spyOn(component.emitToDelete, 'emit');
+    expect(component.emitToDelete.emit).toHaveBeenCalledWith(9);
+  });
 
-        component.onDeleteTo(9);
+  it('debería mostrar el mensaje cuando items está vacío', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
 
-        expect(component.emitToDelete.emit).toHaveBeenCalledWith(9);
-    });
+    fixture.componentRef.setInput('items', [] as Product[]);
+    fixture.detectChanges();
 
-    it('debería mostrar el mensaje cuando items está vacío', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
+    expect(fixture.nativeElement.textContent).toContain('No hay elementos para mostrar.');
+  });
 
-        fixture.componentRef.setInput('items', [] as Product[]);
-        fixture.detectChanges();
+  it('debería renderizar un app-product-item por cada item', () => {
+    const fixture = TestBed.createComponent(ProductListComponent);
 
-        expect(fixture.nativeElement.textContent).toContain('No hay elementos para mostrar.');
-    });
+    const items: Product[] = [
+      { id: 1 } as any as Product,
+      { id: 2 } as any as Product,
+      { id: 3 } as any as Product,
+    ];
 
-    it('debería renderizar un app-product-item por cada item', () => {
-        const fixture = TestBed.createComponent(ProductListComponent);
+    fixture.componentRef.setInput('items', items);
+    fixture.detectChanges();
 
-        const items = [
-            { id: 1 } as any as Product,
-            { id: 2 } as any as Product,
-            { id: 3 } as any as Product,
-        ];
-
-        fixture.componentRef.setInput('items', items);
-        fixture.detectChanges();
-
-        const cards = fixture.nativeElement.querySelectorAll('app-product-item');
-        expect(cards.length).toBe(3);
-    });
+    const cards = fixture.nativeElement.querySelectorAll('app-product-item');
+    expect(cards.length).toBe(3);
+  });
 });
