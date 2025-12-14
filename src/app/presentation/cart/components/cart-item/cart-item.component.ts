@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, input, output, signal } from '@angular/core';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';
 import { CartItem } from '../../../../domain';
@@ -7,7 +7,7 @@ import { UPDATE_DELAY_MS } from '../../../../shared/utils/const.utils';
 @Component({
   selector: 'app-cart-item',
   standalone: true,
-  imports: [CommonModule, ShortDescriptionPipe, NgOptimizedImage],
+  imports: [CommonModule, ShortDescriptionPipe],
   templateUrl: './cart-item.component.html',
   styleUrls: ['./cart-item.component.scss']
 })

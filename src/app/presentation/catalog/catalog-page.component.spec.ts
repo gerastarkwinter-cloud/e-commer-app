@@ -6,7 +6,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 import { CatalogPageComponent } from './catalog-page.component';
 import { ProductListComponent } from './product/product-list/product-list.component';
-import { CartStore, CatalogStore } from '../../application';
+import { AuthStore, CartStore, CatalogStore } from '../../application';
 import { Cart } from '../../domain';
 
 @Component({
@@ -22,14 +22,19 @@ class ProductListStubComponent {
     @Output() emitToDelete = new EventEmitter<number>();
 }
 
+class AuthStoreMock {
+    readonly id = signal<number | null>(1);
+}
+
 class CatalogStoreMock {
-    products = signal<any[]>([]);
+    readonly products = signal<any[]>([]);
     readonly filteredProducts = this.products;
+    readonly loading = signal(false);
     loadCatalogFull = jasmine.createSpy('loadCatalogFull');
 }
 
 class CartStoreMock {
-    id = signal<number | null>(null);
+    readonly id = signal<number | null>(null);
 
     addItemToCart = jasmine.createSpy('addItemToCart');
     saveCart = jasmine.createSpy('saveCart');
@@ -38,31 +43,33 @@ class CartStoreMock {
 }
 
 describe('CatalogPageComponent', () => {
+    let authStore: AuthStoreMock;
     let catalogStore: CatalogStoreMock;
     let cartStore: CartStoreMock;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        authStore = new AuthStoreMock();
         catalogStore = new CatalogStoreMock();
         cartStore = new CartStoreMock();
 
-        TestBed.configureTestingModule({
-            imports: [CatalogPageComponent, ProductListStubComponent],
+        await TestBed.configureTestingModule({
+            imports: [CatalogPageComponent],
             providers: [
                 provideZonelessChangeDetection(),
                 provideRouter([]),
-
+                { provide: AuthStore, useValue: authStore },
                 { provide: CatalogStore, useValue: catalogStore },
                 { provide: CartStore, useValue: cartStore },
             ],
-        });
-
-        TestBed.overrideComponent(CatalogPageComponent, {
-            remove: { imports: [ProductListComponent] },
-            add: { imports: [ProductListStubComponent] },
-        });
+        })
+            .overrideComponent(CatalogPageComponent, {
+                remove: { imports: [ProductListComponent] },
+                add: { imports: [ProductListStubComponent] },
+            })
+            .compileComponents();
     });
 
-    it('debería crear el componente y llamar loadCatalogFull en ngOnInit', () => {
+    it('debería crear el componente y llamar loadCatalogFull', () => {
         const fixture = TestBed.createComponent(CatalogPageComponent);
         const component = fixture.componentInstance;
 
@@ -86,6 +93,7 @@ describe('CatalogPageComponent', () => {
         const fixture = TestBed.createComponent(CatalogPageComponent);
         const component = fixture.componentInstance;
 
+        authStore.id.set(1);
         cartStore.id.set(null);
 
         component.AddToCart({ productId: 5, quantity: 2 });
@@ -95,7 +103,7 @@ describe('CatalogPageComponent', () => {
                 id: null,
                 userId: 1,
                 items: [{ productId: 5, quantity: 2 }],
-            })
+            }),
         );
         expect(cartStore.addItemToCart).not.toHaveBeenCalled();
     });
@@ -104,6 +112,7 @@ describe('CatalogPageComponent', () => {
         const fixture = TestBed.createComponent(CatalogPageComponent);
         const component = fixture.componentInstance;
 
+        authStore.id.set(1);
         cartStore.id.set(7);
 
         component.AddToCart({ productId: 5, quantity: 2 });
@@ -113,23 +122,26 @@ describe('CatalogPageComponent', () => {
                 id: 7,
                 userId: 1,
                 items: [{ productId: 5, quantity: 2 }],
-            })
+            }),
         );
         expect(cartStore.saveCart).not.toHaveBeenCalled();
     });
 
-    it('UpdateItemToCart: debería llamar updateItemInCart con id fijo 1', () => {
+    it('UpdateItemToCart: debería llamar updateItemInCart usando el id del carrito', () => {
         const fixture = TestBed.createComponent(CatalogPageComponent);
         const component = fixture.componentInstance;
+
+        authStore.id.set(1);
+        cartStore.id.set(9);
 
         component.UpdateItemToCart({ productId: 3, quantity: 9 });
 
         expect(cartStore.updateItemInCart).toHaveBeenCalledWith(
             jasmine.objectContaining<Cart>({
-                id: 1,
+                id: 9,
                 userId: 1,
                 items: [{ productId: 3, quantity: 9 }],
-            })
+            }),
         );
     });
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, output, effect, inject, ChangeDetectionStrategy, computed, signal } from '@angular/core';
+import { Component, input, output, effect, inject, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../../../domain';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';

@@ -3,7 +3,7 @@ import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { HeaderComponent } from './header.component';
-import { CatalogStore } from '../../../application';
+import { AuthStore, CatalogStore } from '../../../application';
 
 class CatalogStoreMock {
   readonly categories = signal<string[]>(['electronics', 'jewelery']);
@@ -13,11 +13,19 @@ class CatalogStoreMock {
   clearFilters = jasmine.createSpy('clearFilters');
 }
 
+class AuthStoreMock {
+  // HeaderComponent lee profile() como Signal.
+  readonly profile = signal<any>({ name: { firstname: 'Marcos' } });
+  logOut = jasmine.createSpy('logOut');
+}
+
 describe('HeaderComponent', () => {
   let catalogStore: CatalogStoreMock;
+  let authStore: AuthStoreMock;
 
   beforeEach(() => {
     catalogStore = new CatalogStoreMock();
+    authStore = new AuthStoreMock();
 
     TestBed.configureTestingModule({
       imports: [HeaderComponent],
@@ -25,6 +33,7 @@ describe('HeaderComponent', () => {
         provideZonelessChangeDetection(),
         provideRouter([]),
         { provide: CatalogStore, useValue: catalogStore },
+        { provide: AuthStore, useValue: authStore },
       ],
     });
   });
@@ -37,7 +46,7 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     expect(component).toBeTruthy();
-    expect(component.userName()).toBe('Marcos Maure');
+    expect(component.userName()).toBe('Marcos');
     expect(component.userInitial()).toBe('M');
   });
 
@@ -176,27 +185,27 @@ describe('HeaderComponent', () => {
     expect(component.searchForm.controls.query.value).toBe('');
   });
 
-  it('debería actualizar la inicial si cambia el userName', () => {
+  it('debería actualizar la inicial si cambia el profile.firstname', () => {
     const fixture = TestBed.createComponent(HeaderComponent);
     const component = fixture.componentInstance;
 
     fixture.componentRef.setInput('title', 'MiHogar');
     fixture.detectChanges();
 
-    component.userName.set('ana');
+    authStore.profile.set({ name: { firstname: 'ana' } });
     fixture.detectChanges();
 
     expect(component.userInitial()).toBe('A');
   });
 
-  it('debería la inicial debe ser "?" si userName está vacío.', () => {
+  it('la inicial debe ser "?" si no hay nombre (profile null o firstname vacío)', () => {
     const fixture = TestBed.createComponent(HeaderComponent);
     const component = fixture.componentInstance;
 
     fixture.componentRef.setInput('title', 'MiHogar');
     fixture.detectChanges();
 
-    component.userName.set('');
+    authStore.profile.set(null);
     fixture.detectChanges();
 
     expect(component.userInitial()).toBe('?');

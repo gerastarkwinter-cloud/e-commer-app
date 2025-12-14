@@ -1,7 +1,7 @@
 import { Injectable, Signal, signal } from '@angular/core';
-import { ANotificationService } from '../../domain';
-import { INotification, NotificationType } from '../../domain/models/notification.model';
-import { OnNotification } from '../contract/segregation.interface';
+import { ANotificationService } from '../../../domain';
+import { INotification, NotificationType } from '../../../domain/models/notification.model';
+import { OnNotification } from '../../contract/segregation.interface';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService extends ANotificationService implements OnNotification<INotification> {

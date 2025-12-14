@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, } from '@angular/core';
 import { AuthStore, CartStore, CatalogStore } from '../../application';
 import { Cart } from '../../domain';
 import { ProductListComponent } from './product/product-list/product-list.component';
@@ -8,6 +8,7 @@ import { ProductListComponent } from './product/product-list/product-list.compon
   selector: 'app-catalog',
   standalone: true,
   imports: [CommonModule, ProductListComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './catalog-page.component.html',
 })
 export class CatalogPageComponent implements OnInit {
