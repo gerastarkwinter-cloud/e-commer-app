@@ -19,19 +19,19 @@
     <div class="flex w-full rounded-full border border-slate-700 bg-slate-900/80 overflow-hidden
               focus-within:border-emerald-500 transition-colors">
 
-    <select formControlName="category"
-      class="h-10 px-3 text-xs text-slate-100 bg-slate-950/40 border-r border-slate-700 outline-none">
-      <option value="">Todas</option>
-      @for (c of categories(); track c) {
-      <option [value]="c">{{ c }}</option>
-      }
-    </select>
+      <select formControlName="category"
+        class="h-10 px-3 text-xs text-slate-100 bg-slate-950/40 border-r border-slate-700 outline-none">
+        <option value="">Todas</option>
+        @for (c of categories(); track c) {
+        <option [value]="c">{{ c }}</option>
+        }
+      </select>
 
-    <div class="flex items-center gap-2 flex-1 px-3">
-      <span class="material-symbols-outlined text-base text-slate-300">search</span>
+      <div class="flex items-center gap-2 flex-1 px-3">
+        <span class="material-symbols-outlined text-base text-slate-300">search</span>
 
-      <input type="text" formControlName="query" placeholder="Buscar por título / descripción…"
-        class="w-full bg-transparent outline-none text-sm text-slate-100 placeholder:text-slate-500" />
+        <input type="text" formControlName="query" placeholder="Buscar por título / descripción…"
+          class="w-full bg-transparent outline-none text-sm text-slate-100 placeholder:text-slate-500" />
 
         <button type="button" (click)="onClear()"
           class="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-[0.7rem] font-semibold text-slate-200 hover:bg-slate-800 transition">
@@ -98,6 +98,15 @@
 
 
   <nav class="flex items-center gap-2 text-sm shrink-0">
+    @if(!isLogged()){
+    <a routerLink="/login" routerLinkActive="bg-slate-800 text-slate-50" class="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full
+              border border-slate-700 bg-slate-900/80 text-slate-100
+              hover:border-emerald-500 hover:bg-slate-900 transition-colors">
+      <span class="material-symbols-outlined text-base">key</span>
+      <span class="hidden sm:inline text-xs font-medium">Iniciar sesión</span>
+    </a>
+    }
+
     <a routerLink="/catalog" routerLinkActive="bg-slate-800 text-slate-50" class="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full
               border border-slate-700 bg-slate-900/80 text-slate-100
               hover:border-emerald-500 hover:bg-slate-900 transition-colors">
