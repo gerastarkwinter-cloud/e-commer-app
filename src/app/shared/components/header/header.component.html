@@ -64,6 +64,7 @@
       }
     </a>
 
+    @if (isLogged()) {
     <div class="relative ml-2" (keydown.escape)="closeUserMenu()">
       <button type="button" (click)="toggleUserMenu()" class="inline-flex h-8 w-8 items-center justify-center rounded-full
            border border-slate-700 bg-slate-900 text-xs font-semibold text-emerald-300
@@ -87,6 +88,8 @@
       </div>
       }
     </div>
+    }@else{
 
+    }
   </nav>
 </header>

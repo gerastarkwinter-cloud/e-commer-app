@@ -16,6 +16,7 @@
       {{ product().price | currency}}
     </p>
   </a>
+  @if (isLogged()) {
   <form [formGroup]="formItem" class="mt-auto flex flex-col gap-3">
     <div class="flex flex-1 items-center justify-between gap-3">
       <div class="flex items-center gap-2">
@@ -51,4 +52,5 @@
       </div>
     </div>
   </form>
+  }
 </div>

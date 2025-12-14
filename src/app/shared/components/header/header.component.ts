@@ -16,6 +16,7 @@ export class HeaderComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+  readonly isLogged = this.authStore.logged;
 
   readonly isUserMenuOpen = signal(false);
 

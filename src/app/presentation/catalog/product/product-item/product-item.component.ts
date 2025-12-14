@@ -3,7 +3,7 @@ import { Component, input, output, effect, inject, computed } from '@angular/cor
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product } from '../../../../domain';
 import { ShortDescriptionPipe } from '../../../../shared/pipes/short-description.pipe';
-import { CartStore } from '../../../../application';
+import { AuthStore, CartStore } from '../../../../application';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class ProductItemComponent {
 
+  private readonly authStore = inject(AuthStore);
   private readonly cartStore = inject(CartStore);
   private readonly fb = inject(FormBuilder);
 
@@ -26,6 +27,8 @@ export class ProductItemComponent {
   readonly updateToCart = output<{ productId: number, quantity: number }>();
   readonly deleteToCart = output<number>();
 
+  readonly isLogged= this.authStore.logged;
+  
   readonly formItem = this.fb.nonNullable.group({
     amount: [1, [Validators.required, Validators.min(1)]],
   });
